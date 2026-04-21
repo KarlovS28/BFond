@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Child } from "@workspace/api-client-react";
 import { formatRub, formatPercent } from "@/lib/format";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTrackDonationClick, useGetPublicSettings } from "@workspace/api-client-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { UrgentMarquee } from "./UrgentMarquee";
+import { publicUrlForObject } from "@/lib/upload";
 
 interface ChildDialogProps {
   child: Child | null;
@@ -19,40 +19,42 @@ interface ChildDialogProps {
 export function ChildDialog({ child, open, onOpenChange }: ChildDialogProps) {
   const [amount, setAmount] = useState<number | "">("");
   const [customAmount, setCustomAmount] = useState("");
+  const [paymentMenuOpen, setPaymentMenuOpen] = useState(false);
   const trackDonation = useTrackDonationClick();
   const { data: settings } = useGetPublicSettings();
-  const [isRequisitesOpen, setIsRequisitesOpen] = useState(false);
 
   if (!child) return null;
 
-  const handleDonate = () => {
+  const handleOpenPaymentMenu = () => {
     const finalAmount = amount || (customAmount ? parseInt(customAmount, 10) : null);
-    
-    trackDonation.mutate({ 
-      data: { 
-        childId: child.id, 
-        amount: finalAmount 
-      } 
+    trackDonation.mutate({
+      data: {
+        childId: child.id,
+        amount: finalAmount,
+      },
     });
-
-    if (settings?.donationLink) {
-      window.open(settings.donationLink, "_blank");
-    }
+    setPaymentMenuOpen(true);
   };
 
   const percent = formatPercent(child.collectedSum, child.targetSum);
   const remaining = child.targetSum - child.collectedSum;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        onOpenChange(o);
+        if (!o) setPaymentMenuOpen(false);
+      }}
+    >
       <DialogContent className="max-w-4xl p-0 overflow-hidden bg-card rounded-3xl border-0 shadow-xl max-h-[90vh] overflow-y-auto">
         {child.isUrgent && <UrgentMarquee />}
-        
+
         <div className="grid md:grid-cols-5 h-full">
           <div className="md:col-span-2 h-64 md:h-auto relative">
-            <img 
-              src={child.photoUrl || "/child-placeholder.png"} 
-              alt={`${child.name} ${child.surname}`} 
+            <img
+              src={publicUrlForObject(child.photoUrl) || "/child-placeholder.png"}
+              alt={`${child.name} ${child.surname}`}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:hidden"></div>
@@ -61,7 +63,7 @@ export function ChildDialog({ child, open, onOpenChange }: ChildDialogProps) {
               <p className="text-sm opacity-90">{child.age} лет • {child.diagnosis}</p>
             </div>
           </div>
-          
+
           <div className="md:col-span-3 p-6 md:p-10 flex flex-col">
             <div className="hidden md:block mb-6">
               <DialogTitle className="text-3xl font-serif font-bold text-foreground">
@@ -89,64 +91,85 @@ export function ChildDialog({ child, open, onOpenChange }: ChildDialogProps) {
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <p className="text-sm font-medium text-center">Сумма пожертвования:</p>
-                <div className="grid grid-cols-4 gap-2">
-                  {[100, 300, 500, 1000].map((val) => (
+              {!paymentMenuOpen ? (
+                <div className="space-y-4">
+                  <p className="text-sm font-medium text-center">Сумма пожертвования:</p>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[100, 300, 500, 1000].map((val) => (
+                      <Button
+                        key={val}
+                        type="button"
+                        variant={amount === val ? "default" : "outline"}
+                        className={`rounded-full ${amount === val ? 'bg-primary text-primary-foreground' : 'bg-white'}`}
+                        onClick={() => {
+                          setAmount(val);
+                          setCustomAmount("");
+                        }}
+                      >
+                        {val} ₽
+                      </Button>
+                    ))}
+                  </div>
+                  <Input
+                    type="number"
+                    placeholder="Своя сумма, ₽"
+                    value={customAmount}
+                    onChange={(e) => {
+                      setCustomAmount(e.target.value);
+                      setAmount("");
+                    }}
+                    className="rounded-full text-center bg-white"
+                  />
+
+                  <Button
+                    className="w-full rounded-full h-12 text-base shadow-sm hover:shadow-md transition-all"
+                    onClick={handleOpenPaymentMenu}
+                  >
+                    Перейти к оплате
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  <h4 className="text-base font-serif font-bold text-center">Способы оплаты</h4>
+
+                  {settings?.paymentQrUrl && (
+                    <div className="flex flex-col items-center bg-white rounded-2xl p-5 border border-border">
+                      <p className="text-sm font-medium mb-3 text-center">Отсканируйте QR-код</p>
+                      <img
+                        src={publicUrlForObject(settings.paymentQrUrl)}
+                        alt="QR код для оплаты"
+                        className="w-44 h-44 rounded-xl object-contain"
+                      />
+                    </div>
+                  )}
+
+                  {settings?.requisites && (
+                    <div className="bg-white rounded-2xl p-5 border border-border">
+                      <p className="text-sm font-medium mb-3">Реквизиты для перевода</p>
+                      <pre className="text-xs text-muted-foreground whitespace-pre-wrap break-words font-mono">
+                        {settings.requisites}
+                      </pre>
+                    </div>
+                  )}
+
+                  {settings?.donationLink && (
                     <Button
-                      key={val}
-                      type="button"
-                      variant={amount === val ? "default" : "outline"}
-                      className={`rounded-full ${amount === val ? 'bg-primary text-primary-foreground' : 'bg-white'}`}
-                      onClick={() => {
-                        setAmount(val);
-                        setCustomAmount("");
-                      }}
+                      className="w-full rounded-full h-12 gap-2"
+                      onClick={() => window.open(settings.donationLink, "_blank")}
                     >
-                      {val} ₽
+                      Оплатить онлайн
+                      <ExternalLink className="w-4 h-4" />
                     </Button>
-                  ))}
-                </div>
-                <Input
-                  type="number"
-                  placeholder="Своя сумма, ₽"
-                  value={customAmount}
-                  onChange={(e) => {
-                    setCustomAmount(e.target.value);
-                    setAmount("");
-                  }}
-                  className="rounded-full text-center bg-white"
-                />
-                
-                <Button 
-                  className="w-full rounded-full h-12 text-base shadow-sm hover:shadow-md transition-all" 
-                  onClick={handleDonate}
-                >
-                  Перейти к оплате
-                </Button>
-              </div>
+                  )}
 
-              {settings?.paymentQrUrl && (
-                <div className="pt-4 border-t border-border flex flex-col items-center justify-center">
-                  <p className="text-sm font-medium mb-3 text-center">Или отсканируйте QR для оплаты</p>
-                  <img src={settings.paymentQrUrl} alt="QR код для оплаты" className="w-32 h-32 rounded-xl" />
+                  <Button
+                    variant="ghost"
+                    className="w-full rounded-full"
+                    onClick={() => setPaymentMenuOpen(false)}
+                  >
+                    Назад
+                  </Button>
                 </div>
-              )}
-
-              {settings?.requisites && (
-                <Collapsible open={isRequisitesOpen} onOpenChange={setIsRequisitesOpen} className="w-full border-t border-border pt-4">
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" className="w-full flex justify-between items-center rounded-xl">
-                      <span className="text-sm font-medium">Реквизиты для юрлиц</span>
-                      <ChevronDown className={`h-4 w-4 transition-transform ${isRequisitesOpen ? 'rotate-180' : ''}`} />
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-3">
-                    <pre className="text-xs text-muted-foreground whitespace-pre-wrap bg-white p-4 rounded-xl border border-border/50 overflow-x-auto">
-                      {settings.requisites}
-                    </pre>
-                  </CollapsibleContent>
-                </Collapsible>
               )}
             </div>
           </div>

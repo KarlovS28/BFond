@@ -18,6 +18,8 @@ import { Trash2, Plus, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/format";
 import { ReportInput, Report } from "@workspace/api-client-react";
+import { FileUploadField } from "./FileUploadField";
+import { publicUrlForObject } from "@/lib/upload";
 
 export function AdminReportsTab() {
   const { data: reports, isLoading } = useAdminListReports();
@@ -113,7 +115,7 @@ export function AdminReportsTab() {
                   <TableCell className="font-medium">{report.title}</TableCell>
                   <TableCell>{formatDate(report.createdAt)}</TableCell>
                   <TableCell>
-                    <a href={report.fileUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
+                    <a href={publicUrlForObject(report.fileUrl)} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
                       <Download size={14} /> Скачать
                     </a>
                   </TableCell>
@@ -150,7 +152,7 @@ export function AdminReportsTab() {
                   <TableCell className="font-medium">{report.title}</TableCell>
                   <TableCell>{formatDate(report.createdAt)}</TableCell>
                   <TableCell>
-                    <a href={report.fileUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
+                    <a href={publicUrlForObject(report.fileUrl)} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center gap-1">
                       <Download size={14} /> Скачать
                     </a>
                   </TableCell>
@@ -181,11 +183,18 @@ export function AdminReportsTab() {
             </div>
             
             <div className="space-y-2">
-              <Label>Ссылка на файл (PDF)</Label>
-              <Input required type="url" value={formData.fileUrl} onChange={e => setFormData({...formData, fileUrl: e.target.value})} placeholder="https://..." />
+              <Label>Файл отчёта (PDF)</Label>
+              <FileUploadField
+                value={formData.fileUrl}
+                onChange={(p) => setFormData({ ...formData, fileUrl: p })}
+                accept="application/pdf,.pdf"
+                preview="file"
+                required
+                hint="Прикрепите PDF-файл отчёта"
+              />
             </div>
 
-            <Button type="submit" className="w-full" disabled={createReport.isPending}>Добавить</Button>
+            <Button type="submit" className="w-full" disabled={createReport.isPending || !formData.fileUrl}>Добавить</Button>
           </form>
         </DialogContent>
       </Dialog>

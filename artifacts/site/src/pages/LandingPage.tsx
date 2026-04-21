@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
+import { trackVisit } from "@workspace/api-client-react";
 import { Header } from "@/components/landing/Header";
 import { Hero } from "@/components/landing/Hero";
 import { AboutSection } from "@/components/landing/AboutSection";
@@ -11,6 +12,10 @@ import { ContactsSection } from "@/components/landing/ContactsSection";
 import { Footer } from "@/components/landing/Footer";
 
 export default function LandingPage() {
+  useEffect(() => {
+    trackVisit({ path: window.location.pathname }).catch(() => {});
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 selection:text-foreground">
       <Header />

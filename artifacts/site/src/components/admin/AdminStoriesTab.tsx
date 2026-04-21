@@ -18,6 +18,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { StoryInput, Story } from "@workspace/api-client-react";
+import { FileUploadField } from "./FileUploadField";
+import { publicUrlForObject } from "@/lib/upload";
 
 export function AdminStoriesTab() {
   const { data: stories, isLoading } = useAdminListStories();
@@ -124,7 +126,7 @@ export function AdminStoriesTab() {
             {stories?.map((story) => (
               <TableRow key={story.id}>
                 <TableCell>
-                  <img src={story.photoUrl || "/child-placeholder.png"} alt={story.title} className="w-12 h-12 object-cover rounded-md" />
+                  <img src={publicUrlForObject(story.photoUrl) || "/child-placeholder.png"} alt={story.title} className="w-12 h-12 object-cover rounded-md" />
                 </TableCell>
                 <TableCell className="font-medium">{story.title}</TableCell>
                 <TableCell className="text-muted-foreground text-sm line-clamp-2">{story.description}</TableCell>
@@ -155,8 +157,13 @@ export function AdminStoriesTab() {
             </div>
             
             <div className="space-y-2">
-              <Label>Ссылка на фото</Label>
-              <Input value={formData.photoUrl} onChange={e => setFormData({...formData, photoUrl: e.target.value})} />
+              <Label>Фото</Label>
+              <FileUploadField
+                value={formData.photoUrl}
+                onChange={(p) => setFormData({ ...formData, photoUrl: p })}
+                accept="image/*"
+                preview="image"
+              />
             </div>
 
             <div className="space-y-2">

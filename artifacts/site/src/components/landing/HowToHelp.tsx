@@ -1,27 +1,16 @@
 import React, { useState } from "react";
-import { useGetPublicSettings, useListChildren, useTrackDonationClick } from "@workspace/api-client-react";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, Heart, Users, PackageOpen } from "lucide-react";
+import { Heart, Users, PackageOpen } from "lucide-react";
 import { VolunteerDialog } from "./VolunteerDialog";
 import { MaterialHelpDialog } from "./MaterialHelpDialog";
 
 export function HowToHelp() {
-  const { data: settings } = useGetPublicSettings();
-  const { data: children } = useListChildren();
-  const trackDonation = useTrackDonationClick();
-  
   const [volOpen, setVolOpen] = useState(false);
   const [matOpen, setMatOpen] = useState(false);
-  const [reqOpen, setReqOpen] = useState(false);
 
-  const handleDonate = () => {
-    if (children && children.length > 0) {
-      trackDonation.mutate({ data: { childId: children[0].id } });
-    }
-    if (settings?.donationLink) {
-      window.open(settings.donationLink, "_blank");
-    }
+  const scrollToChildren = () => {
+    const el = document.getElementById("children");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -46,26 +35,9 @@ export function HowToHelp() {
             <p className="text-muted-foreground text-sm mb-8 flex-grow">
               Финансовая поддержка позволяет нам оперативно оплачивать лечение, лекарства и реабилитацию.
             </p>
-            <div className="w-full space-y-4 mt-auto">
-              <Button className="w-full rounded-full h-12" onClick={handleDonate}>
-                Перейти к пожертвованию
-              </Button>
-              {settings?.requisites && (
-                <Collapsible open={reqOpen} onOpenChange={setReqOpen} className="w-full text-left">
-                  <CollapsibleTrigger asChild>
-                    <Button variant="outline" className="w-full justify-between rounded-xl">
-                      <span>Реквизиты фонда</span>
-                      <ChevronDown className={`w-4 h-4 transition-transform ${reqOpen ? 'rotate-180' : ''}`} />
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="pt-2">
-                    <pre className="text-xs text-muted-foreground whitespace-pre-wrap bg-muted/50 p-4 rounded-xl overflow-x-auto">
-                      {settings.requisites}
-                    </pre>
-                  </CollapsibleContent>
-                </Collapsible>
-              )}
-            </div>
+            <Button className="w-full rounded-full h-12 mt-auto" onClick={scrollToChildren}>
+              Выбрать подопечного
+            </Button>
           </div>
 
           {/* Card 2 */}

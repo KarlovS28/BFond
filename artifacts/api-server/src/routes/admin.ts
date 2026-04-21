@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, childrenTable, storiesTable, reportsTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, donationClicksTable } from "@workspace/db";
+import { db, childrenTable, storiesTable, reportsTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, donationClicksTable, visitsTable } from "@workspace/db";
 import { desc, eq, gte, sql } from "drizzle-orm";
 import {
   AdminLoginBody,
@@ -151,28 +151,73 @@ router.get("/submissions", async (_req, res) => {
 router.get("/donation-stats", async (_req, res) => {
   const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7;
   const cutoff = new Date(Date.now() - SEVEN_DAYS_MS);
+
   const grouped = await db
     .select({
       childId: donationClicksTable.childId,
       count: sql<number>`count(*)::int`,
+      totalAmount: sql<number>`coalesce(sum(${donationClicksTable.amount}), 0)::int`,
     })
     .from(donationClicksTable)
     .where(gte(donationClicksTable.createdAt, cutoff))
     .groupBy(donationClicksTable.childId);
 
-  const childIds = grouped.map((g) => g.childId);
+  const kids = await db.select().from(childrenTable);
   const childMap = new Map<number, string>();
-  if (childIds.length > 0) {
-    const kids = await db.select().from(childrenTable);
-    for (const k of kids) childMap.set(k.id, `${k.name} ${k.surname}`);
-  }
+  for (const k of kids) childMap.set(k.id, `${k.name} ${k.surname}`);
+
   const perChild = grouped.map((g) => ({
     childId: g.childId,
     childName: childMap.get(g.childId) ?? `Ребёнок #${g.childId}`,
     count: g.count,
+    totalAmount: g.totalAmount,
   }));
   const totalWeek = perChild.reduce((sum, x) => sum + x.count, 0);
-  res.json({ totalWeek, perChild });
+  const totalAmount = perChild.reduce((sum, x) => sum + (x.totalAmount ?? 0), 0);
+
+  const recentRows = await db
+    .select()
+    .from(donationClicksTable)
+    .orderBy(desc(donationClicksTable.createdAt))
+    .limit(50);
+  const recent = recentRows.map((r) => ({
+    id: r.id,
+    childId: r.childId,
+    childName: childMap.get(r.childId) ?? `Ребёнок #${r.childId}`,
+    amount: r.amount ?? null,
+    createdAt: r.createdAt.toISOString(),
+  }));
+
+  res.json({ totalWeek, totalAmount, perChild, recent });
+});
+
+router.get("/visit-stats", async (_req, res) => {
+  const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7;
+  const cutoff = new Date(Date.now() - SEVEN_DAYS_MS);
+  const perDayRows = await db
+    .select({
+      date: sql<string>`to_char(${visitsTable.createdAt}, 'YYYY-MM-DD')`,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(visitsTable)
+    .where(gte(visitsTable.createdAt, cutoff))
+    .groupBy(sql`to_char(${visitsTable.createdAt}, 'YYYY-MM-DD')`)
+    .orderBy(sql`to_char(${visitsTable.createdAt}, 'YYYY-MM-DD') desc`);
+
+  const totalWeek = perDayRows.reduce((s, r) => s + r.count, 0);
+
+  const recentRows = await db
+    .select()
+    .from(visitsTable)
+    .orderBy(desc(visitsTable.createdAt))
+    .limit(100);
+  const recent = recentRows.map((r) => ({
+    id: r.id,
+    path: r.path,
+    createdAt: r.createdAt.toISOString(),
+  }));
+
+  res.json({ totalWeek, perDay: perDayRows, recent });
 });
 
 router.get("/settings", async (_req, res) => {

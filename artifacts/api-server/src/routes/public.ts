@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, childrenTable, storiesTable, reportsTable, donationClicksTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable } from "@workspace/db";
+import { db, childrenTable, storiesTable, reportsTable, donationClicksTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, visitsTable } from "@workspace/db";
 import { desc, eq, gte, lt } from "drizzle-orm";
 import {
   GetPublicSettingsResponse,
@@ -71,6 +71,16 @@ router.get("/reports/archive", async (_req, res) => {
     .where(lt(reportsTable.createdAt, cutoff))
     .orderBy(desc(reportsTable.createdAt));
   res.json(ListArchiveReportsResponse.parse(rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))));
+});
+
+router.post("/visits", async (req, res) => {
+  const path = typeof req.body?.path === "string" ? req.body.path : "/";
+  await db.insert(visitsTable).values({
+    path,
+    ipAddress: req.ip ?? null,
+    userAgent: req.headers["user-agent"] ?? null,
+  });
+  res.json({ ok: true });
 });
 
 router.post("/donation-clicks", async (req, res) => {

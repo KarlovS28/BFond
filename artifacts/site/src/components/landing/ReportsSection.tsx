@@ -3,6 +3,7 @@ import { useListReports, useListArchiveReports } from "@workspace/api-client-rea
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/format";
 import { Download, FileText } from "lucide-react";
+import { publicUrlForObject } from "@/lib/upload";
 
 export function ReportsSection() {
   const { data: recentReports } = useListReports();
@@ -35,7 +36,7 @@ export function ReportsSection() {
                   <p className="text-sm text-muted-foreground">{formatDate(report.createdAt)}</p>
                 </div>
               </div>
-              <Button variant="outline" size="sm" className="rounded-full gap-2" onClick={() => window.open(report.fileUrl, "_blank")}>
+              <Button variant="outline" size="sm" className="rounded-full gap-2" onClick={() => window.open(publicUrlForObject(report.fileUrl), "_blank")}>
                 <Download size={16} />
                 <span className="hidden sm:inline">Скачать</span>
               </Button>
@@ -64,7 +65,7 @@ export function ReportsSection() {
                         <p className="text-xs text-muted-foreground">{formatDate(report.createdAt)}</p>
                       </div>
                     </div>
-                    <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0" onClick={() => window.open(report.fileUrl, "_blank")}>
+                    <Button variant="ghost" size="sm" className="rounded-full h-8 w-8 p-0" onClick={() => window.open(publicUrlForObject(report.fileUrl), "_blank")}>
                       <Download size={16} />
                     </Button>
                   </div>

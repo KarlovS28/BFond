@@ -180,12 +180,59 @@ export type DonationStatsPerChildItem = {
   childId: number;
   childName: string;
   count: number;
+  totalAmount: number;
+};
+
+export type DonationStatsRecentItem = {
+  id: number;
+  childId: number;
+  childName: string;
+  amount?: number | null;
+  createdAt: string;
 };
 
 export interface DonationStats {
   totalWeek: number;
+  totalAmount: number;
   perChild: DonationStatsPerChildItem[];
+  recent: DonationStatsRecentItem[];
 }
+
+export type VisitStatsPerDayItem = {
+  date: string;
+  count: number;
+};
+
+export type VisitStatsRecentItem = {
+  id: number;
+  path?: string;
+  createdAt: string;
+};
+
+export interface VisitStats {
+  totalWeek: number;
+  perDay: VisitStatsPerDayItem[];
+  recent: VisitStatsRecentItem[];
+}
+
+export interface UploadUrlRequest {
+  /** @minLength 1 */
+  name: string;
+  /** @minimum 1 */
+  size: number;
+  /** @minLength 1 */
+  contentType: string;
+}
+
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: UploadUrlRequest;
+}
+
+export type TrackVisitBody = {
+  path?: string;
+};
 
 export type TrackDonationClickBody = {
   childId: number;

@@ -6,8 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { DonationStatsPerChildItem } from "./donationStatsPerChildItem";
+import type { DonationStatsRecentItem } from "./donationStatsRecentItem";
 
 export interface DonationStats {
   totalWeek: number;
+  totalAmount: number;
   perChild: DonationStatsPerChildItem[];
+  recent: DonationStatsRecentItem[];
 }

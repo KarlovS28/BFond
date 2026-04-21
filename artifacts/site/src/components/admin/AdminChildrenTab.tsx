@@ -20,6 +20,8 @@ import { formatRub } from "@/lib/format";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { ChildInput, Child } from "@workspace/api-client-react";
+import { FileUploadField } from "./FileUploadField";
+import { Label as LabelComp } from "@/components/ui/label";
 
 export function AdminChildrenTab() {
   const { data: children, isLoading } = useAdminListChildren();
@@ -182,8 +184,14 @@ export function AdminChildrenTab() {
             </div>
             
             <div className="space-y-2">
-              <Label>Ссылка на фото</Label>
-              <Input value={formData.photoUrl} onChange={e => setFormData({...formData, photoUrl: e.target.value})} />
+              <LabelComp>Фото ребёнка</LabelComp>
+              <FileUploadField
+                value={formData.photoUrl}
+                onChange={(p) => setFormData({ ...formData, photoUrl: p })}
+                accept="image/*"
+                preview="image"
+                hint="Загрузите фотографию (JPG, PNG)"
+              />
             </div>
 
             <div className="space-y-2">

@@ -13,7 +13,45 @@ tags:
   - name: forms
   - name: admin
   - name: settings
+  - name: Storage
 paths:
+  /storage/uploads/request-url:
+    post:
+      tags: [Storage]
+      operationId: requestUploadUrl
+      summary: Request a presigned URL for file upload
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UploadUrlRequest" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/UploadUrlResponse" }
+
+  /visits:
+    post:
+      operationId: trackVisit
+      tags: [forms]
+      summary: Record a page visit (public)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
   /healthz:
     get:
       operationId: healthCheck
@@ -424,13 +462,25 @@ paths:
     get:
       operationId: adminDonationStats
       tags: [admin]
-      summary: Weekly donation click counts grouped by child
+      summary: Weekly donation click counts grouped by child + recent click list
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema: { $ref: "#/components/schemas/DonationStats" }
+
+  /admin/visit-stats:
+    get:
+      operationId: adminVisitStats
+      tags: [admin]
+      summary: Daily visitor counts and recent visits
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VisitStats" }
 
   /admin/settings:
     get:
@@ -672,15 +722,67 @@ components:
 
     DonationStats:
       type: object
-      required: [perChild, totalWeek]
+      required: [perChild, totalWeek, totalAmount, recent]
       properties:
         totalWeek: { type: integer }
+        totalAmount: { type: integer }
         perChild:
           type: array
           items:
             type: object
-            required: [childId, childName, count]
+            required: [childId, childName, count, totalAmount]
             properties:
               childId: { type: integer }
               childName: { type: string }
               count: { type: integer }
+              totalAmount: { type: integer }
+        recent:
+          type: array
+          items:
+            type: object
+            required: [id, childId, childName, createdAt]
+            properties:
+              id: { type: integer }
+              childId: { type: integer }
+              childName: { type: string }
+              amount: { type: integer, nullable: true }
+              createdAt: { type: string, format: date-time }
+
+    VisitStats:
+      type: object
+      required: [totalWeek, perDay, recent]
+      properties:
+        totalWeek: { type: integer }
+        perDay:
+          type: array
+          items:
+            type: object
+            required: [date, count]
+            properties:
+              date: { type: string }
+              count: { type: integer }
+        recent:
+          type: array
+          items:
+            type: object
+            required: [id, createdAt]
+            properties:
+              id: { type: integer }
+              path: { type: string }
+              createdAt: { type: string, format: date-time }
+
+    UploadUrlRequest:
+      type: object
+      required: [name, size, contentType]
+      properties:
+        name: { type: string, minLength: 1 }
+        size: { type: integer, minimum: 1 }
+        contentType: { type: string, minLength: 1 }
+
+    UploadUrlResponse:
+      type: object
+      required: [uploadURL, objectPath]
+      properties:
+        uploadURL: { type: string, format: uri }
+        objectPath: { type: string }
+        metadata: { $ref: "#/components/schemas/UploadUrlRequest" }

@@ -6,9 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type DonationStatsPerChildItem = {
-  childId: number;
-  childName: string;
-  count: number;
-  totalAmount: number;
+export type TrackVisitBody = {
+  path?: string;
 };

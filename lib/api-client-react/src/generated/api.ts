@@ -34,6 +34,10 @@ import type {
   Story,
   StoryInput,
   TrackDonationClickBody,
+  TrackVisitBody,
+  UploadUrlRequest,
+  UploadUrlResponse,
+  VisitStats,
   VolunteerInput,
 } from "./api.schemas";
 
@@ -45,6 +49,178 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+export const getRequestUploadUrlUrl = () => {
+  return `/api/storage/uploads/request-url`;
+};
+
+export const requestUploadUrl = async (
+  uploadUrlRequest: UploadUrlRequest,
+  options?: RequestInit,
+): Promise<UploadUrlResponse> => {
+  return customFetch<UploadUrlResponse>(getRequestUploadUrlUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(uploadUrlRequest),
+  });
+};
+
+export const getRequestUploadUrlMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestUploadUrl>>,
+    TError,
+    { data: BodyType<UploadUrlRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestUploadUrl>>,
+  TError,
+  { data: BodyType<UploadUrlRequest> },
+  TContext
+> => {
+  const mutationKey = ["requestUploadUrl"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestUploadUrl>>,
+    { data: BodyType<UploadUrlRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return requestUploadUrl(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestUploadUrlMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestUploadUrl>>
+>;
+export type RequestUploadUrlMutationBody = BodyType<UploadUrlRequest>;
+export type RequestUploadUrlMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Request a presigned URL for file upload
+ */
+export const useRequestUploadUrl = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestUploadUrl>>,
+    TError,
+    { data: BodyType<UploadUrlRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof requestUploadUrl>>,
+  TError,
+  { data: BodyType<UploadUrlRequest> },
+  TContext
+> => {
+  return useMutation(getRequestUploadUrlMutationOptions(options));
+};
+
+/**
+ * @summary Record a page visit (public)
+ */
+export const getTrackVisitUrl = () => {
+  return `/api/visits`;
+};
+
+export const trackVisit = async (
+  trackVisitBody: TrackVisitBody,
+  options?: RequestInit,
+): Promise<Ok> => {
+  return customFetch<Ok>(getTrackVisitUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(trackVisitBody),
+  });
+};
+
+export const getTrackVisitMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof trackVisit>>,
+    TError,
+    { data: BodyType<TrackVisitBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof trackVisit>>,
+  TError,
+  { data: BodyType<TrackVisitBody> },
+  TContext
+> => {
+  const mutationKey = ["trackVisit"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof trackVisit>>,
+    { data: BodyType<TrackVisitBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return trackVisit(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type TrackVisitMutationResult = NonNullable<
+  Awaited<ReturnType<typeof trackVisit>>
+>;
+export type TrackVisitMutationBody = BodyType<TrackVisitBody>;
+export type TrackVisitMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Record a page visit (public)
+ */
+export const useTrackVisit = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof trackVisit>>,
+    TError,
+    { data: BodyType<TrackVisitBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof trackVisit>>,
+  TError,
+  { data: BodyType<TrackVisitBody> },
+  TContext
+> => {
+  return useMutation(getTrackVisitMutationOptions(options));
+};
 
 export const getHealthCheckUrl = () => {
   return `/api/healthz`;
@@ -2074,7 +2250,7 @@ export function useAdminListSubmissions<
 }
 
 /**
- * @summary Weekly donation click counts grouped by child
+ * @summary Weekly donation click counts grouped by child + recent click list
  */
 export const getAdminDonationStatsUrl = () => {
   return `/api/admin/donation-stats`;
@@ -2125,7 +2301,7 @@ export type AdminDonationStatsQueryResult = NonNullable<
 export type AdminDonationStatsQueryError = ErrorType<unknown>;
 
 /**
- * @summary Weekly donation click counts grouped by child
+ * @summary Weekly donation click counts grouped by child + recent click list
  */
 
 export function useAdminDonationStats<
@@ -2140,6 +2316,81 @@ export function useAdminDonationStats<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getAdminDonationStatsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Daily visitor counts and recent visits
+ */
+export const getAdminVisitStatsUrl = () => {
+  return `/api/admin/visit-stats`;
+};
+
+export const adminVisitStats = async (
+  options?: RequestInit,
+): Promise<VisitStats> => {
+  return customFetch<VisitStats>(getAdminVisitStatsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getAdminVisitStatsQueryKey = () => {
+  return [`/api/admin/visit-stats`] as const;
+};
+
+export const getAdminVisitStatsQueryOptions = <
+  TData = Awaited<ReturnType<typeof adminVisitStats>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof adminVisitStats>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAdminVisitStatsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof adminVisitStats>>> = ({
+    signal,
+  }) => adminVisitStats({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof adminVisitStats>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type AdminVisitStatsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminVisitStats>>
+>;
+export type AdminVisitStatsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Daily visitor counts and recent visits
+ */
+
+export function useAdminVisitStats<
+  TData = Awaited<ReturnType<typeof adminVisitStats>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof adminVisitStats>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getAdminVisitStatsQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

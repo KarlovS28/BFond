@@ -76,6 +76,14 @@ export const contactsTable = pgTable("contacts", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const visitsTable = pgTable("visits", {
+  id: serial("id").primaryKey(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  path: text("path").notNull().default("/"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const donationClicksTable = pgTable("donation_clicks", {
   id: serial("id").primaryKey(),
   childId: integer("child_id").notNull(),

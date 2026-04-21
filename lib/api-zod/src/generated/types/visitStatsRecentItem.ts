@@ -6,9 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type DonationStatsPerChildItem = {
-  childId: number;
-  childName: string;
-  count: number;
-  totalAmount: number;
+export type VisitStatsRecentItem = {
+  id: number;
+  path?: string;
+  createdAt: Date;
 };

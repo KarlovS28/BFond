@@ -13,7 +13,6 @@ export function HelpRequestForm() {
   const [diagnosis, setDiagnosis] = useState("");
   const [targetSum, setTargetSum] = useState("");
   const [parentContacts, setParentContacts] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
 
   const submit = useSubmitHelpRequest();
   const { toast } = useToast();
@@ -27,14 +26,13 @@ export function HelpRequestForm() {
           age: parseInt(age, 10), 
           diagnosis, 
           targetSum: parseInt(targetSum, 10), 
-          parentContacts,
-          photoUrl: photoUrl || undefined
+          parentContacts
         } 
       },
       {
         onSuccess: () => {
           toast({ title: "Заявка отправлена", description: "Мы рассмотрим её в течение 3 рабочих дней." });
-          setChildName(""); setAge(""); setDiagnosis(""); setTargetSum(""); setParentContacts(""); setPhotoUrl("");
+          setChildName(""); setAge(""); setDiagnosis(""); setTargetSum(""); setParentContacts("");
         },
         onError: () => {
           toast({ title: "Ошибка", description: "Проверьте правильность заполнения полей", variant: "destructive" });
@@ -79,11 +77,6 @@ export function HelpRequestForm() {
             <div className="space-y-2">
               <Label>Контакты родителей (ФИО, телефон, email)</Label>
               <Textarea required value={parentContacts} onChange={e => setParentContacts(e.target.value)} className="resize-none" />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Ссылка на фото (опционально, Яндекс.Диск / Google Drive)</Label>
-              <Input value={photoUrl} onChange={e => setPhotoUrl(e.target.value)} placeholder="https://..." />
             </div>
 
             <Button type="submit" className="w-full md:w-auto md:px-12 rounded-full h-12 text-base" disabled={submit.isPending}>

@@ -6,9 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type DonationStatsPerChildItem = {
+export type DonationStatsRecentItem = {
+  id: number;
   childId: number;
   childName: string;
-  count: number;
-  totalAmount: number;
+  amount?: number | null;
+  createdAt: Date;
 };

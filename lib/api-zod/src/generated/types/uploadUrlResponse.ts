@@ -5,10 +5,10 @@
  * API for "Мечты добрых сердец" charity foundation
  * OpenAPI spec version: 0.1.0
  */
+import type { UploadUrlRequest } from "./uploadUrlRequest";
 
-export type DonationStatsPerChildItem = {
-  childId: number;
-  childName: string;
-  count: number;
-  totalAmount: number;
-};
+export interface UploadUrlResponse {
+  uploadURL: string;
+  objectPath: string;
+  metadata?: UploadUrlRequest;
+}

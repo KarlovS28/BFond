@@ -7,6 +7,40 @@
  */
 import * as zod from "zod";
 
+/**
+ * @summary Request a presigned URL for file upload
+ */
+
+export const RequestUploadUrlBody = zod.object({
+  name: zod.string().min(1),
+  size: zod.number().min(1),
+  contentType: zod.string().min(1),
+});
+
+export const RequestUploadUrlResponse = zod.object({
+  uploadURL: zod.string().url(),
+  objectPath: zod.string(),
+  metadata: zod
+    .object({
+      name: zod.string().min(1),
+      size: zod.number().min(1),
+      contentType: zod.string().min(1),
+    })
+    .optional(),
+});
+
+/**
+ * @summary Record a page visit (public)
+ */
+export const TrackVisitBody = zod.object({
+  path: zod.string().optional(),
+});
+
+export const TrackVisitResponse = zod.object({
+  ok: zod.boolean(),
+  id: zod.number().nullish(),
+});
+
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
@@ -393,15 +427,46 @@ export const AdminListSubmissionsResponse = zod.object({
 });
 
 /**
- * @summary Weekly donation click counts grouped by child
+ * @summary Weekly donation click counts grouped by child + recent click list
  */
 export const AdminDonationStatsResponse = zod.object({
   totalWeek: zod.number(),
+  totalAmount: zod.number(),
   perChild: zod.array(
     zod.object({
       childId: zod.number(),
       childName: zod.string(),
       count: zod.number(),
+      totalAmount: zod.number(),
+    }),
+  ),
+  recent: zod.array(
+    zod.object({
+      id: zod.number(),
+      childId: zod.number(),
+      childName: zod.string(),
+      amount: zod.number().nullish(),
+      createdAt: zod.coerce.date(),
+    }),
+  ),
+});
+
+/**
+ * @summary Daily visitor counts and recent visits
+ */
+export const AdminVisitStatsResponse = zod.object({
+  totalWeek: zod.number(),
+  perDay: zod.array(
+    zod.object({
+      date: zod.string(),
+      count: zod.number(),
+    }),
+  ),
+  recent: zod.array(
+    zod.object({
+      id: zod.number(),
+      path: zod.string().optional(),
+      createdAt: zod.coerce.date(),
     }),
   ),
 });

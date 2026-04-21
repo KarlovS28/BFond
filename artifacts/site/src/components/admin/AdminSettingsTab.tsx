@@ -13,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { SettingsInput } from "@workspace/api-client-react";
 import { Trash2, Plus } from "lucide-react";
+import { FileUploadField } from "./FileUploadField";
 
 export function AdminSettingsTab() {
   const { data: settings, isLoading } = useAdminGetSettings();
@@ -115,8 +116,14 @@ export function AdminSettingsTab() {
           <div className="bg-white p-6 rounded-xl border border-border space-y-4">
             <h3 className="font-medium text-lg">Логотип</h3>
             <div className="space-y-2">
-              <Label>URL логотипа</Label>
-              <Input value={formData.logoUrl} onChange={e => setFormData({...formData, logoUrl: e.target.value})} />
+              <Label>Файл логотипа</Label>
+              <FileUploadField
+                value={formData.logoUrl}
+                onChange={(p) => setFormData({ ...formData, logoUrl: p })}
+                accept="image/*"
+                preview="image"
+                hint="PNG или SVG, прозрачный фон"
+              />
             </div>
             <div className="space-y-2">
               <Label>Размер логотипа (высота в px)</Label>
@@ -133,8 +140,14 @@ export function AdminSettingsTab() {
               <Input value={formData.donationLink} onChange={e => setFormData({...formData, donationLink: e.target.value})} />
             </div>
             <div className="space-y-2">
-              <Label>URL картинки QR-кода</Label>
-              <Input value={formData.paymentQrUrl} onChange={e => setFormData({...formData, paymentQrUrl: e.target.value})} />
+              <Label>QR-код для оплаты</Label>
+              <FileUploadField
+                value={formData.paymentQrUrl}
+                onChange={(p) => setFormData({ ...formData, paymentQrUrl: p })}
+                accept="image/*"
+                preview="image"
+                hint="Загрузите изображение QR-кода"
+              />
             </div>
             <div className="space-y-2">
               <Label>Реквизиты</Label>
@@ -179,10 +192,18 @@ export function AdminSettingsTab() {
           {formData.documents?.map((doc: { title: string; url: string }, idx: number) => (
             <div key={idx} className="flex gap-4 items-start bg-muted/30 p-3 rounded-lg">
               <div className="flex-1 space-y-2">
-                <Input placeholder="Название (например: Устав фонда)" value={doc.title} onChange={e => updateDocument(idx, "title", e.target.value)} required />
+                <Label>Название</Label>
+                <Input placeholder="Например: Устав фонда" value={doc.title} onChange={e => updateDocument(idx, "title", e.target.value)} required />
               </div>
               <div className="flex-1 space-y-2">
-                <Input placeholder="URL документа" value={doc.url} onChange={e => updateDocument(idx, "url", e.target.value)} required />
+                <Label>Файл (PDF / DOC)</Label>
+                <FileUploadField
+                  value={doc.url}
+                  onChange={(p) => updateDocument(idx, "url", p)}
+                  accept=".pdf,.doc,.docx,application/pdf,application/msword"
+                  preview="file"
+                  required
+                />
               </div>
               <Button type="button" variant="ghost" size="icon" className="text-destructive mt-1" onClick={() => removeDocument(idx)}>
                 <Trash2 size={16} />

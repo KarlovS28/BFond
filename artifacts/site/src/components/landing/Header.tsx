@@ -4,7 +4,11 @@ import { useGetPublicSettings } from "@workspace/api-client-react";
 export function Header() {
   const { data: settings } = useGetPublicSettings();
 
-  const logoUrl = settings?.logoUrl || "/generated-logo.png";
+  const logoUrl = settings?.logoUrl
+    ? settings.logoUrl.startsWith("/objects/")
+      ? `/api/storage${settings.logoUrl}`
+      : settings.logoUrl
+    : "/generated-logo.png";
   const orgName = settings?.orgName || "Мечты добрых сердец";
 
   const scrollTo = (id: string) => {
@@ -17,16 +21,13 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/70 border-b border-border/50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-          <img 
-            src={logoUrl} 
-            alt={orgName} 
+        <div className="flex items-center cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+          <img
+            src={logoUrl}
+            alt={orgName}
             style={{ height: `${settings?.logoSize || 40}px` }}
             className="object-contain"
           />
-          <span className="font-serif font-bold text-xl hidden sm:inline-block text-foreground">
-            {orgName}
-          </span>
         </div>
         
         <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
