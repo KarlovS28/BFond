@@ -3,34 +3,684 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: API for "Мечты добрых сердец" charity foundation
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: public
+  - name: forms
+  - name: admin
+  - name: settings
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
-      summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
           content:
             application/json:
+              schema: { $ref: "#/components/schemas/HealthStatus" }
+
+  /settings:
+    get:
+      operationId: getPublicSettings
+      tags: [public]
+      summary: Public site settings (org info, payment links, contacts)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublicSettings" }
+
+  /children:
+    get:
+      operationId: listChildren
+      tags: [public]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
               schema:
-                $ref: "#/components/schemas/HealthStatus"
+                type: array
+                items: { $ref: "#/components/schemas/Child" }
+
+  /children/{id}:
+    get:
+      operationId: getChild
+      tags: [public]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Child" }
+        "404":
+          description: Not found
+
+  /stories:
+    get:
+      operationId: listStories
+      tags: [public]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Story" }
+
+  /reports:
+    get:
+      operationId: listReports
+      tags: [public]
+      summary: Reports for the current week (PDFs published in last 7 days)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Report" }
+
+  /reports/archive:
+    get:
+      operationId: listArchiveReports
+      tags: [public]
+      summary: Archived reports older than 7 days
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Report" }
+
+  /donation-clicks:
+    post:
+      operationId: trackDonationClick
+      tags: [forms]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [childId]
+              properties:
+                childId: { type: integer }
+                amount: { type: integer, nullable: true }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
+  /volunteers:
+    post:
+      operationId: submitVolunteer
+      tags: [forms]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/VolunteerInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
+  /materials:
+    post:
+      operationId: submitMaterialHelp
+      tags: [forms]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MaterialHelpInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
+  /help-requests:
+    post:
+      operationId: submitHelpRequest
+      tags: [forms]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/HelpRequestInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
+  /contacts:
+    post:
+      operationId: submitContact
+      tags: [forms]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ContactInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
+  /admin/login:
+    post:
+      operationId: adminLogin
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username: { type: string }
+                password: { type: string }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminMe" }
+        "401":
+          description: Invalid credentials
+
+  /admin/logout:
+    post:
+      operationId: adminLogout
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
+  /admin/me:
+    get:
+      operationId: adminMe
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminMe" }
+        "401":
+          description: Unauthorized
+
+  /admin/children:
+    get:
+      operationId: adminListChildren
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Child" }
+    post:
+      operationId: adminCreateChild
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ChildInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Child" }
+
+  /admin/children/{id}:
+    put:
+      operationId: adminUpdateChild
+      tags: [admin]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ChildInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Child" }
+    delete:
+      operationId: adminDeleteChild
+      tags: [admin]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
+  /admin/stories:
+    get:
+      operationId: adminListStories
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Story" }
+    post:
+      operationId: adminCreateStory
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StoryInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Story" }
+
+  /admin/stories/{id}:
+    put:
+      operationId: adminUpdateStory
+      tags: [admin]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StoryInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Story" }
+    delete:
+      operationId: adminDeleteStory
+      tags: [admin]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
+  /admin/reports:
+    get:
+      operationId: adminListReports
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Report" }
+    post:
+      operationId: adminCreateReport
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ReportInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Report" }
+
+  /admin/reports/{id}:
+    delete:
+      operationId: adminDeleteReport
+      tags: [admin]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Ok" }
+
+  /admin/submissions:
+    get:
+      operationId: adminListSubmissions
+      tags: [admin]
+      summary: All form submissions in one feed
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminSubmissions" }
+
+  /admin/donation-stats:
+    get:
+      operationId: adminDonationStats
+      tags: [admin]
+      summary: Weekly donation click counts grouped by child
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DonationStats" }
+
+  /admin/settings:
+    get:
+      operationId: adminGetSettings
+      tags: [admin]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublicSettings" }
+    put:
+      operationId: adminUpdateSettings
+      tags: [admin]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SettingsInput" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublicSettings" }
+
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
-        status:
-          type: string
-      required:
-        - status
+        status: { type: string }
 
+    Ok:
+      type: object
+      required: [ok]
+      properties:
+        ok: { type: boolean }
+        id: { type: integer, nullable: true }
+
+    Child:
+      type: object
+      required: [id, name, surname, age, diagnosis, story, photoUrl, targetSum, collectedSum, isActive, isUrgent]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        surname: { type: string }
+        age: { type: integer }
+        diagnosis: { type: string }
+        story: { type: string }
+        photoUrl: { type: string }
+        targetSum: { type: integer }
+        collectedSum: { type: integer }
+        isActive: { type: boolean }
+        isUrgent: { type: boolean }
+
+    ChildInput:
+      type: object
+      required: [name, surname, age, diagnosis, story, photoUrl, targetSum, collectedSum]
+      properties:
+        name: { type: string }
+        surname: { type: string }
+        age: { type: integer }
+        diagnosis: { type: string }
+        story: { type: string }
+        photoUrl: { type: string }
+        targetSum: { type: integer }
+        collectedSum: { type: integer }
+        isActive: { type: boolean }
+        isUrgent: { type: boolean }
+
+    Story:
+      type: object
+      required: [id, title, description, photoUrl]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        description: { type: string }
+        photoUrl: { type: string }
+
+    StoryInput:
+      type: object
+      required: [title, description, photoUrl]
+      properties:
+        title: { type: string }
+        description: { type: string }
+        photoUrl: { type: string }
+
+    Report:
+      type: object
+      required: [id, title, fileUrl, createdAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        fileUrl: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    ReportInput:
+      type: object
+      required: [title, fileUrl]
+      properties:
+        title: { type: string }
+        fileUrl: { type: string }
+
+    VolunteerInput:
+      type: object
+      required: [name, phone, email, city, helpType]
+      properties:
+        name: { type: string }
+        phone: { type: string }
+        email: { type: string }
+        city: { type: string }
+        helpType: { type: string }
+
+    MaterialHelpInput:
+      type: object
+      required: [name, phone, items, preferredDate]
+      properties:
+        name: { type: string }
+        phone: { type: string }
+        items: { type: string }
+        preferredDate: { type: string }
+
+    HelpRequestInput:
+      type: object
+      required: [childName, age, diagnosis, targetSum, parentContacts]
+      properties:
+        childName: { type: string }
+        age: { type: integer }
+        diagnosis: { type: string }
+        targetSum: { type: integer }
+        parentContacts: { type: string }
+        photoUrl: { type: string, nullable: true }
+
+    ContactInput:
+      type: object
+      required: [name, email, message]
+      properties:
+        name: { type: string }
+        email: { type: string }
+        message: { type: string }
+
+    AdminMe:
+      type: object
+      required: [username]
+      properties:
+        username: { type: string }
+
+    PublicSettings:
+      type: object
+      required: [orgName, slogan, mission, legalAddress, email, phone, donationLink, requisites, socials, documents, logoUrl, logoSize, paymentQrUrl]
+      properties:
+        orgName: { type: string }
+        slogan: { type: string }
+        mission: { type: string }
+        legalAddress: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        donationLink: { type: string }
+        requisites: { type: string }
+        logoUrl: { type: string }
+        logoSize: { type: integer }
+        paymentQrUrl: { type: string }
+        socials:
+          type: object
+          properties:
+            telegram: { type: string }
+            vk: { type: string }
+            whatsapp: { type: string }
+            max: { type: string }
+            instagram: { type: string }
+        documents:
+          type: array
+          items:
+            type: object
+            required: [title, url]
+            properties:
+              title: { type: string }
+              url: { type: string }
+
+    SettingsInput:
+      $ref: "#/components/schemas/PublicSettings"
+
+    AdminSubmissions:
+      type: object
+      required: [volunteers, materials, helpRequests, contacts]
+      properties:
+        volunteers:
+          type: array
+          items:
+            type: object
+            required: [id, name, phone, email, city, helpType, createdAt]
+            properties:
+              id: { type: integer }
+              name: { type: string }
+              phone: { type: string }
+              email: { type: string }
+              city: { type: string }
+              helpType: { type: string }
+              createdAt: { type: string, format: date-time }
+        materials:
+          type: array
+          items:
+            type: object
+            required: [id, name, phone, items, preferredDate, createdAt]
+            properties:
+              id: { type: integer }
+              name: { type: string }
+              phone: { type: string }
+              items: { type: string }
+              preferredDate: { type: string }
+              createdAt: { type: string, format: date-time }
+        helpRequests:
+          type: array
+          items:
+            type: object
+            required: [id, childName, age, diagnosis, targetSum, parentContacts, createdAt]
+            properties:
+              id: { type: integer }
+              childName: { type: string }
+              age: { type: integer }
+              diagnosis: { type: string }
+              targetSum: { type: integer }
+              parentContacts: { type: string }
+              photoUrl: { type: string, nullable: true }
+              createdAt: { type: string, format: date-time }
+        contacts:
+          type: array
+          items:
+            type: object
+            required: [id, name, email, message, createdAt]
+            properties:
+              id: { type: integer }
+              name: { type: string }
+              email: { type: string }
+              message: { type: string }
+              createdAt: { type: string, format: date-time }
+
+    DonationStats:
+      type: object
+      required: [perChild, totalWeek]
+      properties:
+        totalWeek: { type: integer }
+        perChild:
+          type: array
+          items:
+            type: object
+            required: [childId, childName, count]
+            properties:
+              childId: { type: integer }
+              childName: { type: string }
+              count: { type: integer }

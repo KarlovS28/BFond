@@ -1,0 +1,62 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "XcfcVgl8CtGM4r0fDyirA"
+uri = "file://artifacts/site/public/logo.png"
+type = "image"
+title = "Foundation logo"
+
+[[generated]]
+id = "LtLRD2xL9hH9_K3W6OWnE"
+uri = "file://artifacts/site/public/hero-bg.png"
+type = "image"
+title = "Hero background"
+
+[[generated]]
+id = "HOFS9ROV-PvxbXKvnSND_"
+uri = "file://artifacts/site/public/child-1.png"
+type = "image"
+title = "Child photo 1"
+
+[[generated]]
+id = "E282CnYrFHCt1G1aT5pmL"
+uri = "file://artifacts/site/public/child-2.png"
+type = "image"
+title = "Child photo 2"
+
+[[generated]]
+id = "7zmsNyjUnIMSZo-ky7gJL"
+uri = "file://artifacts/site/public/child-3.png"
+type = "image"
+title = "Child photo 3"
+
+[[generated]]
+id = "QrRAzp1j-NVvf-5SdWHxi"
+uri = "file://artifacts/site/public/story-1.png"
+type = "image"
+title = "Story photo 1"
+
+[[generated]]
+id = "P0zP0QnPOoBEo1Mz0vv1t"
+uri = "file://artifacts/site/public/story-2.png"
+type = "image"
+title = "Story photo 2"
+
+[[generated]]
+id = "Nw67O37chwmaxuX1tuN2z"
+uri = "file://artifacts/site/public/story-3.png"
+type = "image"
+title = "Story photo 3"
+
+[[generated]]
+id = "KJ9COjcBy4-oY1HNTyeoz"
+uri = "file://artifacts/site/public/generated-logo.png"
+type = "image"
+title = "Charity foundation logo"
+
+[[generated]]
+id = "2btolWLgv10n6lcB8VD6B"
+uri = "file://artifacts/site/public/generated-hero-bg.png"
+type = "image"
+title = "Hero background watercolor"
