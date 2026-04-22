@@ -103,13 +103,23 @@ export function AdminSettingsTab() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Email</Label>
+                <Label>Email (публичный)</Label>
                 <Input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
               </div>
               <div className="space-y-2">
                 <Label>Телефон</Label>
                 <Input type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} />
               </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Email для уведомлений (заявки о помощи)</Label>
+              <Input
+                type="email"
+                value={formData.adminEmail ?? ""}
+                onChange={e => setFormData({ ...formData, adminEmail: e.target.value })}
+                placeholder="admin@example.org"
+              />
+              <p className="text-xs text-muted-foreground">На этот адрес будут приходить новые заявки о помощи с сайта.</p>
             </div>
           </div>
 

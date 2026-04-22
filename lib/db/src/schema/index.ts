@@ -45,6 +45,7 @@ export const volunteersTable = pgTable("volunteers", {
   email: text("email").notNull(),
   city: text("city").notNull(),
   helpType: text("help_type").notNull(),
+  archived: boolean("archived").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -54,6 +55,7 @@ export const materialHelpTable = pgTable("material_help", {
   phone: text("phone").notNull(),
   items: text("items").notNull(),
   preferredDate: text("preferred_date").notNull(),
+  archived: boolean("archived").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -65,6 +67,7 @@ export const helpRequestsTable = pgTable("help_requests", {
   targetSum: integer("target_sum").notNull(),
   parentContacts: text("parent_contacts").notNull(),
   photoUrl: text("photo_url"),
+  archived: boolean("archived").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -73,6 +76,7 @@ export const contactsTable = pgTable("contacts", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   message: text("message").notNull(),
+  archived: boolean("archived").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

@@ -6,12 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export type AdminSubmissionsMaterialsItem = {
-  id: number;
-  name: string;
-  phone: string;
-  items: string;
-  preferredDate: string;
-  archived: boolean;
-  createdAt: Date;
+export type AdminArchiveSubmission200 = {
+  ok: boolean;
 };

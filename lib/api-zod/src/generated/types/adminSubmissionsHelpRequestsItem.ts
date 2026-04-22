@@ -14,5 +14,6 @@ export type AdminSubmissionsHelpRequestsItem = {
   targetSum: number;
   parentContacts: string;
   photoUrl?: string | null;
+  archived: boolean;
   createdAt: Date;
 };

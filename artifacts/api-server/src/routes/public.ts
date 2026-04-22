@@ -1,5 +1,6 @@
 import { Router, type IRouter } from "express";
 import { db, childrenTable, storiesTable, reportsTable, donationClicksTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, visitsTable } from "@workspace/db";
+import { sendMail } from "../lib/mailer";
 import { desc, eq, gte, lt } from "drizzle-orm";
 import {
   GetPublicSettingsResponse,
@@ -118,6 +119,29 @@ router.post("/help-requests", async (req, res) => {
       photoUrl: body.photoUrl ?? null,
     })
     .returning({ id: helpRequestsTable.id });
+
+  void (async () => {
+    try {
+      const settings = await getSettings();
+      const to = settings.adminEmail || settings.email;
+      if (!to) return;
+      const text =
+        `Новая заявка с сайта «${settings.orgName}»\n\n` +
+        `Ребёнок: ${body.childName}\n` +
+        `Возраст: ${body.age} лет\n` +
+        `Диагноз: ${body.diagnosis}\n` +
+        `Необходимая сумма: ${body.targetSum} ₽\n\n` +
+        `Контакты родителей:\n${body.parentContacts}\n`;
+      await sendMail({
+        to,
+        subject: `Новая заявка о помощи — ${body.childName}`,
+        text,
+      });
+    } catch {
+      /* email failures are logged inside sendMail */
+    }
+  })();
+
   res.json({ ok: true, id: inserted[0]?.id ?? null });
 });
 

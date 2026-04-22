@@ -35,24 +35,26 @@ export default function AdminPage() {
           </Button>
         </div>
       </header>
-      
-      <main className="p-6 max-w-6xl mx-auto mt-4">
-        <Tabs defaultValue="children" className="w-full">
-          <TabsList className="mb-6 grid w-full grid-cols-3 md:grid-cols-6 h-auto p-1 bg-white border border-border">
-            <TabsTrigger value="children" className="py-2.5">Подопечные</TabsTrigger>
-            <TabsTrigger value="stories" className="py-2.5">Истории</TabsTrigger>
-            <TabsTrigger value="reports" className="py-2.5">Отчёты</TabsTrigger>
-            <TabsTrigger value="requests" className="py-2.5">Заявки</TabsTrigger>
-            <TabsTrigger value="stats" className="py-2.5">Статистика</TabsTrigger>
-            <TabsTrigger value="settings" className="py-2.5">Настройки</TabsTrigger>
+
+      <main className="p-6 max-w-7xl mx-auto mt-4">
+        <Tabs defaultValue="children" className="w-full flex flex-col md:flex-row gap-6">
+          <TabsList className="md:order-2 md:w-56 md:shrink-0 md:flex md:flex-col md:h-auto md:items-stretch md:gap-1 md:p-2 md:sticky md:top-24 grid grid-cols-3 sm:grid-cols-6 h-auto p-1 bg-white border border-border">
+            <TabsTrigger value="children" className="py-2.5 md:justify-start">Подопечные</TabsTrigger>
+            <TabsTrigger value="stories" className="py-2.5 md:justify-start">Истории</TabsTrigger>
+            <TabsTrigger value="reports" className="py-2.5 md:justify-start">Отчёты</TabsTrigger>
+            <TabsTrigger value="requests" className="py-2.5 md:justify-start">Заявки</TabsTrigger>
+            <TabsTrigger value="stats" className="py-2.5 md:justify-start">Статистика</TabsTrigger>
+            <TabsTrigger value="settings" className="py-2.5 md:justify-start">Настройки</TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="children"><AdminChildrenTab /></TabsContent>
-          <TabsContent value="stories"><AdminStoriesTab /></TabsContent>
-          <TabsContent value="reports"><AdminReportsTab /></TabsContent>
-          <TabsContent value="requests"><AdminSubmissionsTab /></TabsContent>
-          <TabsContent value="stats"><AdminStatsTab /></TabsContent>
-          <TabsContent value="settings"><AdminSettingsTab /></TabsContent>
+
+          <div className="flex-1 md:order-1 min-w-0">
+            <TabsContent value="children" className="mt-0"><AdminChildrenTab /></TabsContent>
+            <TabsContent value="stories" className="mt-0"><AdminStoriesTab /></TabsContent>
+            <TabsContent value="reports" className="mt-0"><AdminReportsTab /></TabsContent>
+            <TabsContent value="requests" className="mt-0"><AdminSubmissionsTab /></TabsContent>
+            <TabsContent value="stats" className="mt-0"><AdminStatsTab /></TabsContent>
+            <TabsContent value="settings" className="mt-0"><AdminSettingsTab /></TabsContent>
+          </div>
         </Tabs>
       </main>
     </div>

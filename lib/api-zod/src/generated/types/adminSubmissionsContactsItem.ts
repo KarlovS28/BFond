@@ -11,5 +11,6 @@ export type AdminSubmissionsContactsItem = {
   name: string;
   email: string;
   message: string;
+  archived: boolean;
   createdAt: Date;
 };

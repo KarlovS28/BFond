@@ -16,15 +16,14 @@ interface ChildCardProps {
 export function ChildCard({ child, index, onClick }: ChildCardProps) {
   const percent = formatPercent(child.collectedSum, child.targetSum);
   const remaining = child.targetSum - child.collectedSum;
-  const isEven = index % 2 === 0;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.5 }}
-      className="group relative bg-card rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer border border-border/50 flex flex-col md:flex-row"
+      transition={{ duration: 0.4, delay: Math.min(index * 0.04, 0.2) }}
+      className="group relative bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all cursor-pointer border border-border/50 flex flex-col"
       onClick={onClick}
     >
       {child.isUrgent && (
@@ -33,7 +32,7 @@ export function ChildCard({ child, index, onClick }: ChildCardProps) {
         </div>
       )}
 
-      <div className={`md:w-2/5 relative h-40 md:h-auto overflow-hidden ${!isEven ? 'md:order-last' : ''}`}>
+      <div className="relative h-40 overflow-hidden">
         <img
           src={publicUrlForObject(child.photoUrl) || "/child-placeholder.png"}
           alt={`${child.name} ${child.surname}`}
@@ -41,37 +40,32 @@ export function ChildCard({ child, index, onClick }: ChildCardProps) {
         />
       </div>
 
-      <div className={`md:w-3/5 p-4 md:p-6 flex flex-col justify-center relative z-10 ${child.isUrgent ? 'pt-8 md:pt-10' : ''}`}>
-        <div className="mb-1">
-          <h3 className="text-lg md:text-xl font-serif font-bold text-foreground">
-            {child.name} {child.surname}
-          </h3>
-          <p className="text-xs font-medium text-muted-foreground mt-0.5">
-            {child.age} лет • {child.diagnosis}
-          </p>
-        </div>
+      <div className={`p-3 flex flex-col flex-1 ${child.isUrgent ? "pt-6" : ""}`}>
+        <h3 className="text-sm font-serif font-bold text-foreground leading-tight">
+          {child.name} {child.surname}
+        </h3>
+        <p className="text-[11px] font-medium text-muted-foreground mt-0.5 mb-2">
+          {child.age} лет • {child.diagnosis}
+        </p>
 
-        <p className="text-foreground/80 line-clamp-2 mb-4 text-sm leading-relaxed">
+        <p className="text-foreground/75 line-clamp-2 mb-3 text-xs leading-relaxed">
           {child.story}
         </p>
 
-        <div className="space-y-2 mt-auto">
-          <div>
-            <div className="flex justify-between text-xs mb-1">
-              <span className="font-medium text-foreground">
-                {formatRub(child.collectedSum)} из {formatRub(child.targetSum)}
-              </span>
-            </div>
-            <Progress value={percent} className="h-1.5 bg-muted" />
-            <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
-              <span>{percent}%</span>
-              <span>Остаток: {formatRub(remaining > 0 ? remaining : 0)}</span>
-            </div>
+        <div className="space-y-1.5 mt-auto">
+          <div className="flex justify-between text-[11px]">
+            <span className="font-medium">{formatRub(child.collectedSum)}</span>
+            <span className="text-muted-foreground">из {formatRub(child.targetSum)}</span>
+          </div>
+          <Progress value={percent} className="h-1.5 bg-muted" />
+          <div className="flex justify-between text-[10px] text-muted-foreground">
+            <span>{percent}%</span>
+            <span>Остаток: {formatRub(remaining > 0 ? remaining : 0)}</span>
           </div>
 
           <Button
             size="sm"
-            className="w-full sm:w-auto mt-2 px-6 rounded-full"
+            className="w-full mt-2 rounded-full text-xs h-8"
             onClick={(e) => {
               e.stopPropagation();
               onClick();

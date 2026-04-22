@@ -13,5 +13,6 @@ export type AdminSubmissionsVolunteersItem = {
   email: string;
   city: string;
   helpType: string;
+  archived: boolean;
   createdAt: Date;
 };

@@ -120,6 +120,7 @@ export interface PublicSettings {
   legalAddress: string;
   email: string;
   phone: string;
+  adminEmail: string;
   donationLink: string;
   requisites: string;
   logoUrl: string;
@@ -138,6 +139,7 @@ export type AdminSubmissionsVolunteersItem = {
   email: string;
   city: string;
   helpType: string;
+  archived: boolean;
   createdAt: string;
 };
 
@@ -147,6 +149,7 @@ export type AdminSubmissionsMaterialsItem = {
   phone: string;
   items: string;
   preferredDate: string;
+  archived: boolean;
   createdAt: string;
 };
 
@@ -158,6 +161,7 @@ export type AdminSubmissionsHelpRequestsItem = {
   targetSum: number;
   parentContacts: string;
   photoUrl?: string | null;
+  archived: boolean;
   createdAt: string;
 };
 
@@ -166,6 +170,7 @@ export type AdminSubmissionsContactsItem = {
   name: string;
   email: string;
   message: string;
+  archived: boolean;
   createdAt: string;
 };
 
@@ -242,4 +247,8 @@ export type TrackDonationClickBody = {
 export type AdminLoginBody = {
   username: string;
   password: string;
+};
+
+export type AdminArchiveSubmission200 = {
+  ok: boolean;
 };

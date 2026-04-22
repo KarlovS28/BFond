@@ -458,6 +458,33 @@ paths:
             application/json:
               schema: { $ref: "#/components/schemas/AdminSubmissions" }
 
+  /admin/submissions/{type}/{id}/archive:
+    post:
+      operationId: adminArchiveSubmission
+      tags: [admin]
+      summary: Move a submission to the archive
+      parameters:
+        - in: path
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: [volunteers, materials, helpRequests, contacts]
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [ok]
+                properties:
+                  ok: { type: boolean }
+
   /admin/donation-stats:
     get:
       operationId: adminDonationStats
@@ -632,7 +659,7 @@ components:
 
     PublicSettings:
       type: object
-      required: [orgName, slogan, mission, legalAddress, email, phone, donationLink, requisites, socials, documents, logoUrl, logoSize, paymentQrUrl]
+      required: [orgName, slogan, mission, legalAddress, email, phone, donationLink, requisites, socials, documents, logoUrl, logoSize, paymentQrUrl, adminEmail]
       properties:
         orgName: { type: string }
         slogan: { type: string }
@@ -640,6 +667,7 @@ components:
         legalAddress: { type: string }
         email: { type: string }
         phone: { type: string }
+        adminEmail: { type: string }
         donationLink: { type: string }
         requisites: { type: string }
         logoUrl: { type: string }
@@ -673,7 +701,7 @@ components:
           type: array
           items:
             type: object
-            required: [id, name, phone, email, city, helpType, createdAt]
+            required: [id, name, phone, email, city, helpType, archived, createdAt]
             properties:
               id: { type: integer }
               name: { type: string }
@@ -681,24 +709,26 @@ components:
               email: { type: string }
               city: { type: string }
               helpType: { type: string }
+              archived: { type: boolean }
               createdAt: { type: string, format: date-time }
         materials:
           type: array
           items:
             type: object
-            required: [id, name, phone, items, preferredDate, createdAt]
+            required: [id, name, phone, items, preferredDate, archived, createdAt]
             properties:
               id: { type: integer }
               name: { type: string }
               phone: { type: string }
               items: { type: string }
               preferredDate: { type: string }
+              archived: { type: boolean }
               createdAt: { type: string, format: date-time }
         helpRequests:
           type: array
           items:
             type: object
-            required: [id, childName, age, diagnosis, targetSum, parentContacts, createdAt]
+            required: [id, childName, age, diagnosis, targetSum, parentContacts, archived, createdAt]
             properties:
               id: { type: integer }
               childName: { type: string }
@@ -707,17 +737,19 @@ components:
               targetSum: { type: integer }
               parentContacts: { type: string }
               photoUrl: { type: string, nullable: true }
+              archived: { type: boolean }
               createdAt: { type: string, format: date-time }
         contacts:
           type: array
           items:
             type: object
-            required: [id, name, email, message, createdAt]
+            required: [id, name, email, message, archived, createdAt]
             properties:
               id: { type: integer }
               name: { type: string }
               email: { type: string }
               message: { type: string }
+              archived: { type: boolean }
               createdAt: { type: string, format: date-time }
 
     DonationStats:

@@ -55,6 +55,7 @@ export const GetPublicSettingsResponse = zod.object({
   legalAddress: zod.string(),
   email: zod.string(),
   phone: zod.string(),
+  adminEmail: zod.string(),
   donationLink: zod.string(),
   requisites: zod.string(),
   logoUrl: zod.string(),
@@ -390,6 +391,7 @@ export const AdminListSubmissionsResponse = zod.object({
       email: zod.string(),
       city: zod.string(),
       helpType: zod.string(),
+      archived: zod.boolean(),
       createdAt: zod.coerce.date(),
     }),
   ),
@@ -400,6 +402,7 @@ export const AdminListSubmissionsResponse = zod.object({
       phone: zod.string(),
       items: zod.string(),
       preferredDate: zod.string(),
+      archived: zod.boolean(),
       createdAt: zod.coerce.date(),
     }),
   ),
@@ -412,6 +415,7 @@ export const AdminListSubmissionsResponse = zod.object({
       targetSum: zod.number(),
       parentContacts: zod.string(),
       photoUrl: zod.string().nullish(),
+      archived: zod.boolean(),
       createdAt: zod.coerce.date(),
     }),
   ),
@@ -421,9 +425,22 @@ export const AdminListSubmissionsResponse = zod.object({
       name: zod.string(),
       email: zod.string(),
       message: zod.string(),
+      archived: zod.boolean(),
       createdAt: zod.coerce.date(),
     }),
   ),
+});
+
+/**
+ * @summary Move a submission to the archive
+ */
+export const AdminArchiveSubmissionParams = zod.object({
+  type: zod.enum(["volunteers", "materials", "helpRequests", "contacts"]),
+  id: zod.coerce.number(),
+});
+
+export const AdminArchiveSubmissionResponse = zod.object({
+  ok: zod.boolean(),
 });
 
 /**
@@ -478,6 +495,7 @@ export const AdminGetSettingsResponse = zod.object({
   legalAddress: zod.string(),
   email: zod.string(),
   phone: zod.string(),
+  adminEmail: zod.string(),
   donationLink: zod.string(),
   requisites: zod.string(),
   logoUrl: zod.string(),
@@ -505,6 +523,7 @@ export const AdminUpdateSettingsBody = zod.object({
   legalAddress: zod.string(),
   email: zod.string(),
   phone: zod.string(),
+  adminEmail: zod.string(),
   donationLink: zod.string(),
   requisites: zod.string(),
   logoUrl: zod.string(),
@@ -532,6 +551,7 @@ export const AdminUpdateSettingsResponse = zod.object({
   legalAddress: zod.string(),
   email: zod.string(),
   phone: zod.string(),
+  adminEmail: zod.string(),
   donationLink: zod.string(),
   requisites: zod.string(),
   logoUrl: zod.string(),

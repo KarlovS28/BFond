@@ -15,6 +15,7 @@ export interface PublicSettings {
   legalAddress: string;
   email: string;
   phone: string;
+  adminEmail: string;
   donationLink: string;
   requisites: string;
   logoUrl: string;

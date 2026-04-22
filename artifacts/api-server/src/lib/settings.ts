@@ -8,6 +8,7 @@ export type Settings = {
   legalAddress: string;
   email: string;
   phone: string;
+  adminEmail: string;
   donationLink: string;
   requisites: string;
   logoUrl: string;
@@ -31,6 +32,7 @@ export const DEFAULT_SETTINGS: Settings = {
   legalAddress: "Краснодар, ул. Дунаевского 1, оф. 7",
   email: "mectydobryhserdec@gmail.com",
   phone: "+7 (XXX) XXX-XX-XX",
+  adminEmail: "mectydobryhserdec@gmail.com",
   donationLink: "https://www.tinkoff.ru/cf/charity",
   requisites:
     "Получатель: БФ «Мечты добрых сердец»\nИНН: 0000000000\nКПП: 000000000\nР/с: 00000000000000000000\nБанк: ПАО Сбербанк\nК/с: 00000000000000000000\nБИК: 000000000\nНазначение платежа: Благотворительное пожертвование",

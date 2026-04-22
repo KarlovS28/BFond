@@ -6,6 +6,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./adminArchiveSubmission200";
 export * from "./adminLoginBody";
 export * from "./adminMe";
 export * from "./adminSubmissions";

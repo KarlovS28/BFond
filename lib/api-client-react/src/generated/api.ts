@@ -17,6 +17,7 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  AdminArchiveSubmission200,
   AdminLoginBody,
   AdminMe,
   AdminSubmissions,
@@ -2248,6 +2249,112 @@ export function useAdminListSubmissions<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * @summary Move a submission to the archive
+ */
+export const getAdminArchiveSubmissionUrl = (
+  type: "volunteers" | "materials" | "helpRequests" | "contacts",
+  id: number,
+) => {
+  return `/api/admin/submissions/${type}/${id}/archive`;
+};
+
+export const adminArchiveSubmission = async (
+  type: "volunteers" | "materials" | "helpRequests" | "contacts",
+  id: number,
+  options?: RequestInit,
+): Promise<AdminArchiveSubmission200> => {
+  return customFetch<AdminArchiveSubmission200>(
+    getAdminArchiveSubmissionUrl(type, id),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+};
+
+export const getAdminArchiveSubmissionMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminArchiveSubmission>>,
+    TError,
+    {
+      type: "volunteers" | "materials" | "helpRequests" | "contacts";
+      id: number;
+    },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof adminArchiveSubmission>>,
+  TError,
+  {
+    type: "volunteers" | "materials" | "helpRequests" | "contacts";
+    id: number;
+  },
+  TContext
+> => {
+  const mutationKey = ["adminArchiveSubmission"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof adminArchiveSubmission>>,
+    {
+      type: "volunteers" | "materials" | "helpRequests" | "contacts";
+      id: number;
+    }
+  > = (props) => {
+    const { type, id } = props ?? {};
+
+    return adminArchiveSubmission(type, id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AdminArchiveSubmissionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminArchiveSubmission>>
+>;
+
+export type AdminArchiveSubmissionMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Move a submission to the archive
+ */
+export const useAdminArchiveSubmission = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof adminArchiveSubmission>>,
+    TError,
+    {
+      type: "volunteers" | "materials" | "helpRequests" | "contacts";
+      id: number;
+    },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof adminArchiveSubmission>>,
+  TError,
+  {
+    type: "volunteers" | "materials" | "helpRequests" | "contacts";
+    id: number;
+  },
+  TContext
+> => {
+  return useMutation(getAdminArchiveSubmissionMutationOptions(options));
+};
 
 /**
  * @summary Weekly donation click counts grouped by child + recent click list

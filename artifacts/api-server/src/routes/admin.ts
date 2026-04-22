@@ -148,6 +148,28 @@ router.get("/submissions", async (_req, res) => {
   });
 });
 
+router.post("/submissions/:type/:id/archive", async (req, res) => {
+  const { type } = req.params;
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id)) {
+    res.status(400).json({ error: "Invalid id" });
+    return;
+  }
+  const tableMap = {
+    volunteers: volunteersTable,
+    materials: materialHelpTable,
+    helpRequests: helpRequestsTable,
+    contacts: contactsTable,
+  } as const;
+  const table = tableMap[type as keyof typeof tableMap];
+  if (!table) {
+    res.status(400).json({ error: "Unknown submission type" });
+    return;
+  }
+  await db.update(table).set({ archived: true }).where(eq(table.id, id));
+  res.json({ ok: true });
+});
+
 router.get("/donation-stats", async (_req, res) => {
   const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7;
   const cutoff = new Date(Date.now() - SEVEN_DAYS_MS);
