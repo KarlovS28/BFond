@@ -18,7 +18,7 @@ export function Hero() {
 
   return (
     <section 
-      className="relative w-full py-24 md:py-32 lg:py-48 flex items-center justify-center overflow-hidden"
+      className="relative w-full py-10 md:py-15 lg:py-10 flex items-center justify-center overflow-hidden"
       style={{
         backgroundImage: "url('/generated-hero-bg.png')",
         backgroundSize: "cover",
@@ -27,7 +27,7 @@ export function Hero() {
     >
       <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px]"></div>
       
-      <div className="container relative z-10 mx-auto px-4 flex flex-col items-center text-center">
+      <div className="container relative z-10 mx-auto px-40 flex flex-col items-center text-center">
         <motion.h1 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

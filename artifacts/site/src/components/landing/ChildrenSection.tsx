@@ -11,18 +11,18 @@ export function ChildrenSection() {
   if (!children || children.length === 0) return null;
 
   return (
-    <section id="children" className="py-24 bg-muted/20">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
+    <section id="children" className="bg-[linear-gradient(180deg,rgba(253,249,244,0.96),rgba(248,241,232,0.92))] py-20 md:py-24">
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mb-14 text-center md:mb-16">
+          <h2 className="mb-4 text-4xl font-serif font-bold text-foreground md:text-5xl">
             Им нужна помощь
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mx-auto max-w-3xl text-lg leading-8 text-muted-foreground md:text-xl">
             Каждое пожертвование приближает этих детей к здоровой жизни.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {children.map((child, idx) => (
             <ChildCard
               key={child.id}

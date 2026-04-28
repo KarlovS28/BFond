@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/format";
+import { publicUrlForObject } from "@/lib/upload";
 import { Check } from "lucide-react";
 
 type SubmissionType = "volunteers" | "materials" | "helpRequests" | "contacts";
@@ -192,7 +193,7 @@ export function AdminSubmissionsTab() {
                     <TableCell className="text-xs max-w-xs whitespace-pre-wrap">{r.parentContacts}</TableCell>
                     <TableCell>
                       {r.photoUrl ? (
-                        <a href={r.photoUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        <a href={publicUrlForObject(r.photoUrl)} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                           Ссылка
                         </a>
                       ) : (

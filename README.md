@@ -31,9 +31,12 @@ Express + PostgreSQL.
 | `SESSION_SECRET`  | Секрет для подписи сессионных cookie |
 | `ADMIN_USERNAME`  | Логин администратора (создаётся при первом старте) |
 | `ADMIN_PASSWORD`  | Пароль администратора (создаётся при первом старте) |
-| `PORT`            | Порт API-сервера (по умолчанию 8080) |
+| `PORT`            | Единый порт приложения (API + фронтенд) |
 | `BASE_PATH`       | Базовый путь фронта (для прод-деплоя `/`) |
 | `NODE_ENV`        | `production` для прод-сборки |
+| `PUBLIC_EMAIL`    | Публичный email фонда по умолчанию |
+| `ADMIN_NOTIFICATION_EMAIL` | Email для заявок по умолчанию |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` | SMTP-настройки для отправки писем |
 
 ## Админ-панель
 
@@ -63,12 +66,15 @@ Express + PostgreSQL.
 pnpm install
 pnpm --filter @workspace/db run push   # применить схему БД
 pnpm --filter @workspace/api-spec run codegen  # обновить хуки/zod, если меняли openapi.yaml
-# Запустить две команды в разных терминалах:
-PORT=8080 pnpm --filter @workspace/api-server run dev
-PORT=5173 BASE_PATH=/ pnpm --filter @workspace/site run dev
+PORT=80 pnpm run dev
 ```
 
-Откройте http://localhost:5173 — фронт сходит в API на http://localhost:8080.
+Если порт `80` занят или система не даёт открыть привилегированный порт без
+дополнительных прав, используйте, например, `PORT=8080 pnpm run dev`.
+
+Откройте `http://localhost` при `PORT=80` или `http://localhost:8080` при
+другом значении `PORT`. И API, и фронтенд теперь обслуживаются через один
+порт одним сервером.
 
 ## Деплой на свой сервер (Ubuntu 22.04 + Nginx) — пошагово
 

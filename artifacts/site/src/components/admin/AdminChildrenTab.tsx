@@ -156,7 +156,7 @@ export function AdminChildrenTab() {
             <DialogTitle>{editingChild ? "Редактировать запись" : "Добавить ребёнка"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSave} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>Имя</Label>
                 <Input required value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />

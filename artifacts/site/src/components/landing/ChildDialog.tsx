@@ -51,13 +51,13 @@ export function ChildDialog({ child, open, onOpenChange }: ChildDialogProps) {
         {child.isUrgent && <UrgentMarquee />}
 
         <div className="grid md:grid-cols-5 h-full">
-          <div className="md:col-span-2 h-64 md:h-auto relative">
+          <div className="relative h-72 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.98),_rgba(247,238,229,0.94)_55%,_rgba(239,224,207,0.9)_100%)] md:col-span-2 md:h-auto">
             <img
               src={publicUrlForObject(child.photoUrl) || "/child-placeholder.png"}
               alt={`${child.name} ${child.surname}`}
-              className="w-full h-full object-cover"
+              className="h-full w-full object-contain p-4 md:p-6"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent md:hidden"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-white/25 md:hidden"></div>
             <div className="absolute bottom-4 left-4 right-4 md:hidden text-white">
               <h2 className="text-2xl font-serif font-bold">{child.name} {child.surname}</h2>
               <p className="text-sm opacity-90">{child.age} лет • {child.diagnosis}</p>

@@ -30,9 +30,12 @@ export const DEFAULT_SETTINGS: Settings = {
   mission:
     "Мы — благотворительный фонд, который помогает детям с тяжёлыми диагнозами получить лечение, реабилитацию и поддержку. Каждое доброе сердце приближает чудо.",
   legalAddress: "Краснодар, ул. Дунаевского 1, оф. 7",
-  email: "mectydobryhserdec@gmail.com",
+  email: process.env.PUBLIC_EMAIL || "mectydobryhserdec@gmail.com",
   phone: "+7 (XXX) XXX-XX-XX",
-  adminEmail: "mectydobryhserdec@gmail.com",
+  adminEmail:
+    process.env.ADMIN_NOTIFICATION_EMAIL ||
+    process.env.PUBLIC_EMAIL ||
+    "mectydobryhserdec@gmail.com",
   donationLink: "https://www.tinkoff.ru/cf/charity",
   requisites:
     "Получатель: БФ «Мечты добрых сердец»\nИНН: 0000000000\nКПП: 000000000\nР/с: 00000000000000000000\nБанк: ПАО Сбербанк\nК/с: 00000000000000000000\nБИК: 000000000\nНазначение платежа: Благотворительное пожертвование",

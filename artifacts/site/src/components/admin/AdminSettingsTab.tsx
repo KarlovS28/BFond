@@ -101,7 +101,7 @@ export function AdminSettingsTab() {
               <Label>Юридический адрес</Label>
               <Input value={formData.legalAddress} onChange={e => setFormData({...formData, legalAddress: e.target.value})} />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>Email (публичный)</Label>
                 <Input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
@@ -200,12 +200,13 @@ export function AdminSettingsTab() {
         </div>
         <div className="space-y-3">
           {formData.documents?.map((doc: { title: string; url: string }, idx: number) => (
-            <div key={idx} className="flex gap-4 items-start bg-muted/30 p-3 rounded-lg">
-              <div className="flex-1 space-y-2">
+            <div key={idx} className="rounded-lg bg-muted/30 p-3 md:p-4">
+              <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] md:items-start">
+              <div className="space-y-2">
                 <Label>Название</Label>
                 <Input placeholder="Например: Устав фонда" value={doc.title} onChange={e => updateDocument(idx, "title", e.target.value)} required />
               </div>
-              <div className="flex-1 space-y-2">
+              <div className="space-y-2">
                 <Label>Файл (PDF / DOC)</Label>
                 <FileUploadField
                   value={doc.url}
@@ -215,9 +216,10 @@ export function AdminSettingsTab() {
                   required
                 />
               </div>
-              <Button type="button" variant="ghost" size="icon" className="text-destructive mt-1" onClick={() => removeDocument(idx)}>
+              <Button type="button" variant="ghost" size="icon" className="text-destructive md:mt-7" onClick={() => removeDocument(idx)}>
                 <Trash2 size={16} />
               </Button>
+              </div>
             </div>
           ))}
           {(!formData.documents || formData.documents.length === 0) && (

@@ -2,6 +2,7 @@ import React from "react";
 import { useGetPublicSettings } from "@workspace/api-client-react";
 import { motion } from "framer-motion";
 import { MapPin, FileText } from "lucide-react";
+import { publicUrlForObject } from "@/lib/upload";
 
 export function AboutSection() {
   const { data: settings } = useGetPublicSettings();
@@ -36,7 +37,7 @@ export function AboutSection() {
               {settings.documents?.map((doc, idx) => (
                 <a 
                   key={idx}
-                  href={doc.url}
+                  href={publicUrlForObject(doc.url)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 bg-muted/50 hover:bg-muted text-foreground px-4 py-2 rounded-full text-sm font-medium transition-colors"

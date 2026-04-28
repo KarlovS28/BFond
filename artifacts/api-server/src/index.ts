@@ -1,5 +1,9 @@
-import app from "./app";
 import { logger } from "./lib/logger";
+import { loadWorkspaceEnv } from "./lib/load-env";
+
+loadWorkspaceEnv();
+
+const { default: app } = await import("./app");
 
 const rawPort = process.env["PORT"];
 
