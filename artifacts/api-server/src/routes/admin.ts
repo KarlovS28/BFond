@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, childrenTable, storiesTable, reportsTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, donationClicksTable, visitsTable } from "@workspace/db";
+import { db, childrenTable, storiesTable, reportsTable, galleryItemsTable, bannersTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, donationClicksTable, visitsTable } from "@workspace/db";
 import { desc, eq, gte, sql } from "drizzle-orm";
 import {
   AdminLoginBody,
@@ -130,6 +130,175 @@ router.post("/reports", async (req, res) => {
 router.delete("/reports/:id", async (req, res) => {
   const id = Number(req.params.id);
   await db.delete(reportsTable).where(eq(reportsTable.id, id));
+  res.json({ ok: true });
+});
+
+router.get("/gallery-items", async (_req, res) => {
+  const [items, children] = await Promise.all([
+    db.select().from(galleryItemsTable).orderBy(desc(galleryItemsTable.createdAt), desc(galleryItemsTable.id)),
+    db.select().from(childrenTable),
+  ]);
+
+  const childMap = new Map(children.map((child) => [child.id, `${child.name} ${child.surname}`]));
+
+  res.json(
+    items.map((item) => ({
+      ...item,
+      childName: item.childId ? childMap.get(item.childId) ?? null : null,
+      createdAt: item.createdAt.toISOString(),
+    })),
+  );
+});
+
+router.post("/gallery-items", async (req, res) => {
+  const body = req.body as {
+    title?: string;
+    description?: string;
+    photoUrl?: string;
+    childId?: number | null;
+  };
+
+  if (!body.title || !body.description || !body.photoUrl) {
+    res.status(400).json({ error: "Missing required fields" });
+    return;
+  }
+
+  const inserted = await db
+    .insert(galleryItemsTable)
+    .values({
+      title: body.title,
+      description: body.description,
+      photoUrl: body.photoUrl,
+      childId: body.childId ?? null,
+    })
+    .returning();
+
+  res.json({ ...inserted[0], childName: null, createdAt: inserted[0].createdAt.toISOString() });
+});
+
+router.put("/gallery-items/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  const body = req.body as {
+    title?: string;
+    description?: string;
+    photoUrl?: string;
+    childId?: number | null;
+  };
+
+  if (!body.title || !body.description || !body.photoUrl) {
+    res.status(400).json({ error: "Missing required fields" });
+    return;
+  }
+
+  const updated = await db
+    .update(galleryItemsTable)
+    .set({
+      title: body.title,
+      description: body.description,
+      photoUrl: body.photoUrl,
+      childId: body.childId ?? null,
+    })
+    .where(eq(galleryItemsTable.id, id))
+    .returning();
+
+  if (updated.length === 0) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+
+  const item = updated[0];
+  let childName: string | null = null;
+  if (item.childId) {
+    const child = await db.select().from(childrenTable).where(eq(childrenTable.id, item.childId)).limit(1);
+    childName = child[0] ? `${child[0].name} ${child[0].surname}` : null;
+  }
+
+  res.json({ ...item, childName, createdAt: item.createdAt.toISOString() });
+});
+
+router.delete("/gallery-items/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  await db.delete(galleryItemsTable).where(eq(galleryItemsTable.id, id));
+  res.json({ ok: true });
+});
+
+router.get("/banners", async (_req, res) => {
+  const rows = await db.select().from(bannersTable).orderBy(desc(bannersTable.createdAt), desc(bannersTable.id));
+  res.json(rows.map((row) => ({ ...row, createdAt: row.createdAt.toISOString() })));
+});
+
+router.post("/banners", async (req, res) => {
+  const body = req.body as {
+    title?: string;
+    description?: string;
+    imageUrl?: string;
+    linkUrl?: string;
+    isEnabled?: boolean;
+  };
+
+  const existing = await db.select({ count: sql<number>`count(*)::int` }).from(bannersTable);
+  if ((existing[0]?.count ?? 0) >= 10) {
+    res.status(400).json({ error: "Можно добавить не более 10 баннеров" });
+    return;
+  }
+
+  if (!body.title || !body.description || !body.imageUrl) {
+    res.status(400).json({ error: "Missing required fields" });
+    return;
+  }
+
+  const inserted = await db
+    .insert(bannersTable)
+    .values({
+      title: body.title,
+      description: body.description,
+      imageUrl: body.imageUrl,
+      linkUrl: body.linkUrl ?? "",
+      isEnabled: body.isEnabled ?? true,
+    })
+    .returning();
+
+  res.json({ ...inserted[0], createdAt: inserted[0].createdAt.toISOString() });
+});
+
+router.put("/banners/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  const body = req.body as {
+    title?: string;
+    description?: string;
+    imageUrl?: string;
+    linkUrl?: string;
+    isEnabled?: boolean;
+  };
+
+  if (!body.title || !body.description || !body.imageUrl) {
+    res.status(400).json({ error: "Missing required fields" });
+    return;
+  }
+
+  const updated = await db
+    .update(bannersTable)
+    .set({
+      title: body.title,
+      description: body.description,
+      imageUrl: body.imageUrl,
+      linkUrl: body.linkUrl ?? "",
+      isEnabled: body.isEnabled ?? true,
+    })
+    .where(eq(bannersTable.id, id))
+    .returning();
+
+  if (updated.length === 0) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+
+  res.json({ ...updated[0], createdAt: updated[0].createdAt.toISOString() });
+});
+
+router.delete("/banners/:id", async (req, res) => {
+  const id = Number(req.params.id);
+  await db.delete(bannersTable).where(eq(bannersTable.id, id));
   res.json({ ok: true });
 });
 

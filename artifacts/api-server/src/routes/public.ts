@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, childrenTable, storiesTable, reportsTable, donationClicksTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, visitsTable } from "@workspace/db";
+import { db, childrenTable, storiesTable, reportsTable, galleryItemsTable, bannersTable, donationClicksTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, visitsTable } from "@workspace/db";
 import { sendMail } from "../lib/mailer";
 import { desc, eq, gte, lt } from "drizzle-orm";
 import {
@@ -50,6 +50,33 @@ router.get("/children/:id", async (req, res) => {
 router.get("/stories", async (_req, res) => {
   const rows = await db.select().from(storiesTable).orderBy(desc(storiesTable.id));
   res.json(ListStoriesResponse.parse(rows));
+});
+
+router.get("/gallery-items", async (_req, res) => {
+  const [items, children] = await Promise.all([
+    db.select().from(galleryItemsTable).orderBy(desc(galleryItemsTable.createdAt), desc(galleryItemsTable.id)),
+    db.select().from(childrenTable),
+  ]);
+
+  const childMap = new Map(children.map((child) => [child.id, `${child.name} ${child.surname}`]));
+
+  res.json(
+    items.map((item) => ({
+      ...item,
+      childName: item.childId ? childMap.get(item.childId) ?? null : null,
+      createdAt: item.createdAt.toISOString(),
+    })),
+  );
+});
+
+router.get("/banners", async (_req, res) => {
+  const rows = await db
+    .select()
+    .from(bannersTable)
+    .where(eq(bannersTable.isEnabled, true))
+    .orderBy(desc(bannersTable.createdAt), desc(bannersTable.id));
+
+  res.json(rows.map((row) => ({ ...row, createdAt: row.createdAt.toISOString() })));
 });
 
 const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7;
