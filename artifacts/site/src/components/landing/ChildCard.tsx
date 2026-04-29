@@ -11,9 +11,10 @@ interface ChildCardProps {
   child: Child;
   index: number;
   onClick: () => void;
+  onOpenGallery: () => void;
 }
 
-export function ChildCard({ child, index, onClick }: ChildCardProps) {
+export function ChildCard({ child, index, onClick, onOpenGallery }: ChildCardProps) {
   const percent = formatPercent(child.collectedSum, child.targetSum);
   const remaining = child.targetSum - child.collectedSum;
   const photoUrl = publicUrlForObject(child.photoUrl) || "/child-placeholder.png";
@@ -45,7 +46,7 @@ export function ChildCard({ child, index, onClick }: ChildCardProps) {
           <img
             src={photoUrl}
             alt={`${child.name} ${child.surname}`}
-            className="relative z-10 h-full w-full object-contain object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+            className="relative z-10 h-full w-full object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.03]"
           />
         </div>
       </div>
@@ -73,16 +74,29 @@ export function ChildCard({ child, index, onClick }: ChildCardProps) {
             <span>Остаток: {formatRub(remaining > 0 ? remaining : 0)}</span>
           </div>
 
-          <Button
-            size="sm"
-            className="mt-2 h-11 w-full rounded-full text-sm sm:h-12 sm:text-base"
-            onClick={(e) => {
-              e.stopPropagation();
-              onClick();
-            }}
-          >
-            Помочь
-          </Button>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            <Button
+              size="sm"
+              className="h-11 rounded-full text-sm sm:h-12 sm:text-base"
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+              }}
+            >
+              Помочь
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-11 rounded-full border-primary/30 bg-white/85 text-sm text-primary hover:bg-primary/5 sm:h-12 sm:text-base"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenGallery();
+              }}
+            >
+              Жизнь наших подопечных
+            </Button>
+          </div>
         </div>
       </div>
     </motion.div>

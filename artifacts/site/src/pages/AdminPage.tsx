@@ -11,6 +11,8 @@ import { AdminReportsTab } from "@/components/admin/AdminReportsTab";
 import { AdminSubmissionsTab } from "@/components/admin/AdminSubmissionsTab";
 import { AdminStatsTab } from "@/components/admin/AdminStatsTab";
 import { AdminSettingsTab } from "@/components/admin/AdminSettingsTab";
+import { AdminGalleryTab } from "@/components/admin/AdminGalleryTab";
+import { AdminBannersTab } from "@/components/admin/AdminBannersTab";
 
 export default function AdminPage() {
   const [, setLocation] = useLocation();
@@ -44,6 +46,8 @@ export default function AdminPage() {
               <TabsTrigger value="stories" className="min-h-11 px-4 py-3 text-sm md:justify-start">Истории</TabsTrigger>
               <TabsTrigger value="reports" className="min-h-11 px-4 py-3 text-sm md:justify-start">Отчёты</TabsTrigger>
               <TabsTrigger value="requests" className="min-h-11 px-4 py-3 text-sm md:justify-start">Заявки</TabsTrigger>
+              <TabsTrigger value="gallery" className="min-h-11 px-4 py-3 text-sm md:justify-start">Галерея</TabsTrigger>
+              <TabsTrigger value="banners" className="min-h-11 px-4 py-3 text-sm md:justify-start">Банеры</TabsTrigger>
               <TabsTrigger value="stats" className="min-h-11 px-4 py-3 text-sm md:justify-start">Статистика</TabsTrigger>
               <TabsTrigger value="settings" className="min-h-11 px-4 py-3 text-sm md:justify-start">Настройки</TabsTrigger>
             </TabsList>
@@ -54,6 +58,8 @@ export default function AdminPage() {
             <TabsContent value="stories" className="mt-0"><AdminStoriesTab /></TabsContent>
             <TabsContent value="reports" className="mt-0"><AdminReportsTab /></TabsContent>
             <TabsContent value="requests" className="mt-0"><AdminSubmissionsTab /></TabsContent>
+            <TabsContent value="gallery" className="mt-0"><AdminGalleryTab /></TabsContent>
+            <TabsContent value="banners" className="mt-0"><AdminBannersTab /></TabsContent>
             <TabsContent value="stats" className="mt-0"><AdminStatsTab /></TabsContent>
             <TabsContent value="settings" className="mt-0"><AdminSettingsTab /></TabsContent>
           </div>

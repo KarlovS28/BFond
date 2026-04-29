@@ -4,7 +4,7 @@ import { ChildCard } from "./ChildCard";
 import { ChildDialog } from "./ChildDialog";
 import { Child } from "@workspace/api-client-react";
 
-export function ChildrenSection() {
+export function ChildrenSection({ onOpenGallery }: { onOpenGallery: (childId: number) => void }) {
   const { data: children } = useListChildren();
   const [selectedChild, setSelectedChild] = useState<Child | null>(null);
 
@@ -29,6 +29,7 @@ export function ChildrenSection() {
               child={child}
               index={idx}
               onClick={() => setSelectedChild(child)}
+              onOpenGallery={() => onOpenGallery(child.id)}
             />
           ))}
         </div>

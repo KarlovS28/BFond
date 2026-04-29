@@ -10,22 +10,22 @@ export function AboutSection() {
   if (!settings) return null;
 
   return (
-    <section id="about" className="py-24 bg-white">
+    <section id="about" className="py-16 md:py-20 bg-white">
       <div className="container mx-auto px-4 max-w-5xl">
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-10 md:mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-6">О фонде</h2>
-          <p className="text-lg text-muted-foreground whitespace-pre-wrap text-left md:text-center max-w-3xl mx-auto leading-relaxed">
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">О фонде</h2>
+          <p className="text-base md:text-lg text-muted-foreground whitespace-pre-wrap text-left md:text-center max-w-3xl mx-auto leading-relaxed">
             {settings.mission}
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-12 items-start mt-12">
+        <div className="grid md:grid-cols-2 gap-8 items-start mt-8">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}

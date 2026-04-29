@@ -17,12 +17,13 @@ import { Label } from "@/components/ui/label";
 import { Trash2, Plus, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatDate } from "@/lib/format";
-import { ReportInput, Report } from "@workspace/api-client-react";
+import { ReportInput, Report, useAdminVisitStats } from "@workspace/api-client-react";
 import { FileUploadField } from "./FileUploadField";
 import { publicUrlForObject } from "@/lib/upload";
 
 export function AdminReportsTab() {
   const { data: reports, isLoading } = useAdminListReports();
+  const { data: visits } = useAdminVisitStats();
   const createReport = useAdminCreateReport();
   const deleteReport = useAdminDeleteReport();
   
@@ -92,6 +93,33 @@ export function AdminReportsTab() {
 
   return (
     <div className="space-y-8">
+      <div className="space-y-4">
+        <h3 className="text-lg font-medium">Логи работы сайта по дням</h3>
+        <div className="bg-white rounded-xl border border-border overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Дата</TableHead>
+                <TableHead className="text-right">Посещения</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {visits?.perDay?.map((day) => (
+                <TableRow key={day.date}>
+                  <TableCell className="font-medium">{new Date(`${day.date}T00:00:00`).toLocaleDateString("ru-RU")}</TableCell>
+                  <TableCell className="text-right">{day.count}</TableCell>
+                </TableRow>
+              ))}
+              {(!visits?.perDay || visits.perDay.length === 0) && (
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center py-4 text-muted-foreground">Нет данных по логам</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
+
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-serif font-medium">Отчёты</h2>
         <Button onClick={openCreate} className="gap-2"><Plus size={16}/> Добавить отчёт</Button>
