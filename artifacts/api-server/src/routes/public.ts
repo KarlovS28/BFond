@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, childrenTable, storiesTable, reportsTable, galleryItemsTable, bannersTable, donationClicksTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, visitsTable } from "@workspace/db";
+import { db, childrenTable, storiesTable, reportsTable, galleryItemsTable, galleryPhotosTable, bannersTable, donationClicksTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, visitsTable } from "@workspace/db";
 import { sendMail } from "../lib/mailer";
 import { desc, eq, gte, lt } from "drizzle-orm";
 import {
@@ -53,16 +53,25 @@ router.get("/stories", async (_req, res) => {
 });
 
 router.get("/gallery-items", async (_req, res) => {
-  const [items, children] = await Promise.all([
+  const [items, children, photos] = await Promise.all([
     db.select().from(galleryItemsTable).orderBy(desc(galleryItemsTable.createdAt), desc(galleryItemsTable.id)),
     db.select().from(childrenTable),
+    db.select().from(galleryPhotosTable).orderBy(galleryPhotosTable.sortOrder, galleryPhotosTable.id),
   ]);
 
   const childMap = new Map(children.map((child) => [child.id, `${child.name} ${child.surname}`]));
+  const photoMap = new Map<number, string[]>();
+
+  for (const photo of photos) {
+    const list = photoMap.get(photo.galleryItemId) ?? [];
+    list.push(photo.photoUrl);
+    photoMap.set(photo.galleryItemId, list);
+  }
 
   res.json(
     items.map((item) => ({
       ...item,
+      photos: photoMap.get(item.id)?.length ? photoMap.get(item.id) : [item.photoUrl],
       childName: item.childId ? childMap.get(item.childId) ?? null : null,
       createdAt: item.createdAt.toISOString(),
     })),
@@ -76,7 +85,11 @@ router.get("/banners", async (_req, res) => {
     .where(eq(bannersTable.isEnabled, true))
     .orderBy(desc(bannersTable.createdAt), desc(bannersTable.id));
 
-  res.json(rows.map((row) => ({ ...row, createdAt: row.createdAt.toISOString() })));
+  res.json(
+    rows
+      .filter((row) => !row.isArchived)
+      .map((row) => ({ ...row, createdAt: row.createdAt.toISOString() })),
+  );
 });
 
 const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7;

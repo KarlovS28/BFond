@@ -1,5 +1,5 @@
 import { Router, type IRouter } from "express";
-import { db, childrenTable, storiesTable, reportsTable, galleryItemsTable, bannersTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, donationClicksTable, visitsTable } from "@workspace/db";
+import { db, childrenTable, storiesTable, reportsTable, galleryItemsTable, galleryPhotosTable, bannersTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, donationClicksTable, visitsTable } from "@workspace/db";
 import { desc, eq, gte, sql } from "drizzle-orm";
 import {
   AdminLoginBody,
@@ -134,16 +134,25 @@ router.delete("/reports/:id", async (req, res) => {
 });
 
 router.get("/gallery-items", async (_req, res) => {
-  const [items, children] = await Promise.all([
+  const [items, children, photos] = await Promise.all([
     db.select().from(galleryItemsTable).orderBy(desc(galleryItemsTable.createdAt), desc(galleryItemsTable.id)),
     db.select().from(childrenTable),
+    db.select().from(galleryPhotosTable).orderBy(galleryPhotosTable.sortOrder, galleryPhotosTable.id),
   ]);
 
   const childMap = new Map(children.map((child) => [child.id, `${child.name} ${child.surname}`]));
+  const photoMap = new Map<number, string[]>();
+
+  for (const photo of photos) {
+    const list = photoMap.get(photo.galleryItemId) ?? [];
+    list.push(photo.photoUrl);
+    photoMap.set(photo.galleryItemId, list);
+  }
 
   res.json(
     items.map((item) => ({
       ...item,
+      photos: photoMap.get(item.id)?.length ? photoMap.get(item.id) : [item.photoUrl],
       childName: item.childId ? childMap.get(item.childId) ?? null : null,
       createdAt: item.createdAt.toISOString(),
     })),
@@ -155,6 +164,7 @@ router.post("/gallery-items", async (req, res) => {
     title?: string;
     description?: string;
     photoUrl?: string;
+    photos?: string[];
     childId?: number | null;
   };
 
@@ -163,17 +173,34 @@ router.post("/gallery-items", async (req, res) => {
     return;
   }
 
+  const normalizedPhotos = Array.from(new Set((body.photos ?? [body.photoUrl]).filter(Boolean))).slice(0, 10);
+
   const inserted = await db
     .insert(galleryItemsTable)
     .values({
       title: body.title,
       description: body.description,
-      photoUrl: body.photoUrl,
+      photoUrl: normalizedPhotos[0] ?? body.photoUrl,
       childId: body.childId ?? null,
     })
     .returning();
 
-  res.json({ ...inserted[0], childName: null, createdAt: inserted[0].createdAt.toISOString() });
+  if (normalizedPhotos.length > 0) {
+    await db.insert(galleryPhotosTable).values(
+      normalizedPhotos.map((photoUrl, index) => ({
+        galleryItemId: inserted[0].id,
+        photoUrl,
+        sortOrder: index,
+      })),
+    );
+  }
+
+  res.json({
+    ...inserted[0],
+    photos: normalizedPhotos.length ? normalizedPhotos : [inserted[0].photoUrl],
+    childName: null,
+    createdAt: inserted[0].createdAt.toISOString(),
+  });
 });
 
 router.put("/gallery-items/:id", async (req, res) => {
@@ -182,6 +209,7 @@ router.put("/gallery-items/:id", async (req, res) => {
     title?: string;
     description?: string;
     photoUrl?: string;
+    photos?: string[];
     childId?: number | null;
   };
 
@@ -190,12 +218,14 @@ router.put("/gallery-items/:id", async (req, res) => {
     return;
   }
 
+  const normalizedPhotos = Array.from(new Set((body.photos ?? [body.photoUrl]).filter(Boolean))).slice(0, 10);
+
   const updated = await db
     .update(galleryItemsTable)
     .set({
       title: body.title,
       description: body.description,
-      photoUrl: body.photoUrl,
+      photoUrl: normalizedPhotos[0] ?? body.photoUrl,
       childId: body.childId ?? null,
     })
     .where(eq(galleryItemsTable.id, id))
@@ -206,6 +236,17 @@ router.put("/gallery-items/:id", async (req, res) => {
     return;
   }
 
+  await db.delete(galleryPhotosTable).where(eq(galleryPhotosTable.galleryItemId, id));
+  if (normalizedPhotos.length > 0) {
+    await db.insert(galleryPhotosTable).values(
+      normalizedPhotos.map((photoUrl, index) => ({
+        galleryItemId: id,
+        photoUrl,
+        sortOrder: index,
+      })),
+    );
+  }
+
   const item = updated[0];
   let childName: string | null = null;
   if (item.childId) {
@@ -213,11 +254,17 @@ router.put("/gallery-items/:id", async (req, res) => {
     childName = child[0] ? `${child[0].name} ${child[0].surname}` : null;
   }
 
-  res.json({ ...item, childName, createdAt: item.createdAt.toISOString() });
+  res.json({
+    ...item,
+    photos: normalizedPhotos.length ? normalizedPhotos : [item.photoUrl],
+    childName,
+    createdAt: item.createdAt.toISOString(),
+  });
 });
 
 router.delete("/gallery-items/:id", async (req, res) => {
   const id = Number(req.params.id);
+  await db.delete(galleryPhotosTable).where(eq(galleryPhotosTable.galleryItemId, id));
   await db.delete(galleryItemsTable).where(eq(galleryItemsTable.id, id));
   res.json({ ok: true });
 });
@@ -255,6 +302,7 @@ router.post("/banners", async (req, res) => {
       imageUrl: body.imageUrl,
       linkUrl: body.linkUrl ?? "",
       isEnabled: body.isEnabled ?? true,
+      isArchived: false,
     })
     .returning();
 
@@ -284,6 +332,7 @@ router.put("/banners/:id", async (req, res) => {
       imageUrl: body.imageUrl,
       linkUrl: body.linkUrl ?? "",
       isEnabled: body.isEnabled ?? true,
+      isArchived: body.isArchived ?? false,
     })
     .where(eq(bannersTable.id, id))
     .returning();

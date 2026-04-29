@@ -31,6 +31,7 @@ const emptyForm: GalleryItemInput = {
   title: "",
   description: "",
   photoUrl: "",
+  photos: [],
   childId: null,
 };
 
@@ -62,6 +63,7 @@ export function AdminGalleryTab() {
       title: item.title,
       description: item.description,
       photoUrl: item.photoUrl,
+      photos: item.photos?.length ? item.photos : [item.photoUrl],
       childId: item.childId,
     });
     setDialogOpen(true);
@@ -210,11 +212,53 @@ export function AdminGalleryTab() {
               <Label>Фотография</Label>
               <FileUploadField
                 value={formData.photoUrl}
-                onChange={(path) => setFormData({ ...formData, photoUrl: path })}
+                onChange={(path) => setFormData({
+                  ...formData,
+                  photoUrl: path,
+                  photos: formData.photos.length ? [path, ...formData.photos.slice(1)] : [path],
+                })}
                 accept="image/*"
                 preview="image"
                 required
               />
+            </div>
+
+            <div className="space-y-3">
+              <Label>Фотографии альбома (до 10)</Label>
+              <div className="grid gap-3 md:grid-cols-2">
+                {Array.from({ length: 10 }).map((_, index) => {
+                  const value = formData.photos[index] ?? "";
+                  return (
+                    <div key={index} className="rounded-xl border border-border/60 p-3">
+                      <div className="mb-2 text-sm font-medium text-muted-foreground">
+                        Фото {index + 1}
+                      </div>
+                      <FileUploadField
+                        value={value}
+                        onChange={(path) => {
+                          const nextPhotos = [...formData.photos];
+                          if (path) {
+                            nextPhotos[index] = path;
+                          } else {
+                            nextPhotos.splice(index, 1);
+                          }
+                          const normalized = nextPhotos.filter(Boolean).slice(0, 10);
+                          setFormData({
+                            ...formData,
+                            photoUrl: normalized[0] ?? "",
+                            photos: normalized,
+                          });
+                        }}
+                        accept="image/*"
+                        preview="image"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Первая фотография будет обложкой карточки мероприятия.
+              </p>
             </div>
 
             <div className="space-y-2">
