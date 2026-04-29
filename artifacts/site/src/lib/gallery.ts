@@ -5,6 +5,7 @@ export type GalleryItem = {
   title: string;
   description: string;
   photoUrl: string;
+  photos: string[];
   childId: number | null;
   childName: string | null;
   createdAt: string;
@@ -14,6 +15,7 @@ export type GalleryItemInput = {
   title: string;
   description: string;
   photoUrl: string;
+  photos: string[];
   childId: number | null;
 };
 

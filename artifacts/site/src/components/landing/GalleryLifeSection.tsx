@@ -1,7 +1,10 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useGalleryItems } from "@/lib/gallery";
 import { publicUrlForObject } from "@/lib/upload";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export type GalleryFilter = number | "general" | null;
 
@@ -15,6 +18,9 @@ export function GalleryLifeSection({
   onSelectFilter,
 }: GalleryLifeSectionProps) {
   const { data: items, isLoading } = useGalleryItems();
+  const [activeAlbumId, setActiveAlbumId] = useState<number | null>(null);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
 
   const groups = useMemo(() => {
     if (!items) return [];
@@ -48,6 +54,11 @@ export function GalleryLifeSection({
     if (selectedFilter === "general") return items.filter((item) => item.childId === null);
     return items.filter((item) => item.childId === selectedFilter);
   }, [items, selectedFilter]);
+
+  const activeAlbum = useMemo(
+    () => filteredItems.find((item) => item.id === activeAlbumId) ?? items?.find((item) => item.id === activeAlbumId) ?? null,
+    [activeAlbumId, filteredItems, items],
+  );
 
   useEffect(() => {
     if (selectedFilter === null) return;
@@ -142,7 +153,12 @@ export function GalleryLifeSection({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.4, delay: Math.min(index * 0.04, 0.18) }}
-              className="group relative overflow-hidden rounded-[30px] border border-white/70 bg-white shadow-[0_18px_48px_-28px_rgba(165,145,115,0.45)]"
+              className="group relative cursor-pointer overflow-hidden rounded-[30px] border border-white/70 bg-white shadow-[0_18px_48px_-28px_rgba(165,145,115,0.45)]"
+              onClick={() => {
+                setActiveAlbumId(item.id);
+                setActivePhotoIndex(0);
+                setZoomed(false);
+              }}
             >
               <div className="relative aspect-[4/5] overflow-hidden">
                 <img
@@ -168,6 +184,105 @@ export function GalleryLifeSection({
         </div>
         )}
       </div>
+
+      <Dialog
+        open={Boolean(activeAlbum)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setActiveAlbumId(null);
+            setActivePhotoIndex(0);
+            setZoomed(false);
+          }
+        }}
+      >
+        {activeAlbum && (
+          <DialogContent className="max-w-6xl border-0 bg-transparent p-0 shadow-none">
+            <div className="rounded-[32px] bg-[rgba(21,16,13,0.92)] p-4 text-white sm:p-6" onContextMenu={(e) => e.preventDefault()}>
+              <DialogTitle className="sr-only">{activeAlbum.title}</DialogTitle>
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-white/65">
+                    {activeAlbum.childName || "Наши мероприятия"}
+                  </p>
+                  <h3 className="mt-2 text-2xl font-serif font-bold sm:text-3xl">{activeAlbum.title}</h3>
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-white/82 sm:text-base">
+                    {activeAlbum.description}
+                  </p>
+                </div>
+                <div className="hidden items-center gap-2 sm:flex">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="rounded-full border-white/20 bg-white/10 text-white hover:bg-white/20"
+                    onClick={() => {
+                      setZoomed(false);
+                      setActivePhotoIndex((current) => (current - 1 + activeAlbum.photos.length) % activeAlbum.photos.length);
+                    }}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="rounded-full border-white/20 bg-white/10 text-white hover:bg-white/20"
+                    onClick={() => {
+                      setZoomed(false);
+                      setActivePhotoIndex((current) => (current + 1) % activeAlbum.photos.length);
+                    }}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="relative overflow-hidden rounded-[28px] bg-black/30">
+                <button
+                  type="button"
+                  className="w-full"
+                  onClick={() => setZoomed((value) => !value)}
+                >
+                  <img
+                    src={publicUrlForObject(activeAlbum.photos[activePhotoIndex]) || "/child-placeholder.png"}
+                    alt={activeAlbum.title}
+                    draggable={false}
+                    className={`h-[58vh] w-full select-none object-contain transition-transform duration-300 ${zoomed ? "scale-[1.55] cursor-zoom-out" : "cursor-zoom-in"}`}
+                  />
+                </button>
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[rgba(21,16,13,0.72)] to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[rgba(21,16,13,0.72)] to-transparent" />
+              </div>
+
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {activeAlbum.photos.map((photo, index) => (
+                    <button
+                      key={`${photo}-${index}`}
+                      type="button"
+                      onClick={() => {
+                        setZoomed(false);
+                        setActivePhotoIndex(index);
+                      }}
+                      className={`overflow-hidden rounded-2xl border transition-all ${
+                        activePhotoIndex === index ? "border-white/70" : "border-white/10"
+                      }`}
+                    >
+                      <img
+                        src={publicUrlForObject(photo) || "/child-placeholder.png"}
+                        alt=""
+                        draggable={false}
+                        className="h-16 w-20 object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+                <div className="text-sm text-white/70">
+                  {activePhotoIndex + 1} / {activeAlbum.photos.length}
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        )}
+      </Dialog>
     </section>
   );
 }

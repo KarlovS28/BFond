@@ -47,6 +47,14 @@ export const galleryItemsTable = pgTable("gallery_items", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const galleryPhotosTable = pgTable("gallery_photos", {
+  id: serial("id").primaryKey(),
+  galleryItemId: integer("gallery_item_id").notNull(),
+  photoUrl: text("photo_url").notNull(),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const bannersTable = pgTable("banners", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -54,6 +62,7 @@ export const bannersTable = pgTable("banners", {
   imageUrl: text("image_url").notNull(),
   linkUrl: text("link_url").notNull().default(""),
   isEnabled: boolean("is_enabled").notNull().default(true),
+  isArchived: boolean("is_archived").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
