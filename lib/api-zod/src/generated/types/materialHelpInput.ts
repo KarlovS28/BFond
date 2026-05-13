@@ -11,4 +11,5 @@ export interface MaterialHelpInput {
   phone: string;
   items: string;
   preferredDate: string;
+  consentAccepted: boolean;
 }

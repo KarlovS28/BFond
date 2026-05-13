@@ -12,6 +12,7 @@ export interface PublicSettings {
   orgName: string;
   slogan: string;
   mission: string;
+  backgroundImageUrl: string;
   legalAddress: string;
   email: string;
   phone: string;

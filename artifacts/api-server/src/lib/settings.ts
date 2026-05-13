@@ -5,6 +5,7 @@ export type Settings = {
   orgName: string;
   slogan: string;
   mission: string;
+  backgroundImageUrl: string;
   legalAddress: string;
   email: string;
   phone: string;
@@ -29,6 +30,7 @@ export const DEFAULT_SETTINGS: Settings = {
   slogan: "Помогаем детям, которые верят в чудо",
   mission:
     "Мы — благотворительный фонд, который помогает детям с тяжёлыми диагнозами получить лечение, реабилитацию и поддержку. Каждое доброе сердце приближает чудо.",
+  backgroundImageUrl: "/foundation-background.png",
   legalAddress: "Краснодар, ул. Дунаевского 1, оф. 7",
   email: process.env.PUBLIC_EMAIL || "mectydobryhserdec@gmail.com",
   phone: "+7 (XXX) XXX-XX-XX",

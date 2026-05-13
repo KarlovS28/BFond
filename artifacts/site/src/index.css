@@ -178,6 +178,9 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif tracking-tight;
   }
+  html, body, #root {
+    min-height: 100%;
+  }
 }
 
 @keyframes marquee {
@@ -186,4 +189,25 @@
 }
 .animate-marquee {
   animation: marquee 20s linear infinite;
+}
+
+.landing-slide {
+  min-height: calc(100dvh - 5rem);
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+  display: flex;
+  align-items: stretch;
+}
+
+.landing-slide > section {
+  width: 100%;
+}
+
+#landing-scroll-root {
+  scrollbar-width: none;
+  overscroll-behavior-y: contain;
+}
+
+#landing-scroll-root::-webkit-scrollbar {
+  display: none;
 }

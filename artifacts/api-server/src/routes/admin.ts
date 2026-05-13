@@ -1,5 +1,19 @@
 import { Router, type IRouter } from "express";
-import { db, childrenTable, storiesTable, reportsTable, galleryItemsTable, galleryPhotosTable, bannersTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, donationClicksTable, visitsTable } from "@workspace/db";
+import { db } from "@workspace/db";
+import {
+  bannersTable,
+  childrenTable,
+  contactsTable,
+  donationClicksTable,
+  galleryItemsTable,
+  galleryPhotosTable,
+  helpRequestsTable,
+  materialHelpTable,
+  reportsTable,
+  storiesTable,
+  visitsTable,
+  volunteersTable,
+} from "@workspace/db/schema";
 import { desc, eq, gte, sql } from "drizzle-orm";
 import {
   AdminLoginBody,
@@ -281,9 +295,13 @@ router.post("/banners", async (req, res) => {
     imageUrl?: string;
     linkUrl?: string;
     isEnabled?: boolean;
+    isArchived?: boolean;
   };
 
-  const existing = await db.select({ count: sql<number>`count(*)::int` }).from(bannersTable);
+  const existing = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(bannersTable)
+    .where(eq(bannersTable.isArchived, false));
   if ((existing[0]?.count ?? 0) >= 10) {
     res.status(400).json({ error: "Можно добавить не более 10 баннеров" });
     return;
@@ -302,7 +320,7 @@ router.post("/banners", async (req, res) => {
       imageUrl: body.imageUrl,
       linkUrl: body.linkUrl ?? "",
       isEnabled: body.isEnabled ?? true,
-      isArchived: false,
+      isArchived: body.isArchived ?? false,
     })
     .returning();
 
@@ -317,6 +335,7 @@ router.put("/banners/:id", async (req, res) => {
     imageUrl?: string;
     linkUrl?: string;
     isEnabled?: boolean;
+    isArchived?: boolean;
   };
 
   if (!body.title || !body.description || !body.imageUrl) {

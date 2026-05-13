@@ -25,7 +25,7 @@ export function ChildCard({ child, index, onClick, onOpenGallery }: ChildCardPro
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.4, delay: Math.min(index * 0.04, 0.2) }}
-      className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[28px] border border-white/70 bg-white shadow-[0_18px_48px_-28px_rgba(165,145,115,0.45)] transition-all hover:-translate-y-1 hover:shadow-[0_24px_64px_-28px_rgba(165,145,115,0.55)]"
+      className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-[28px] border border-white/70 bg-white/86 shadow-[0_18px_48px_-28px_rgba(165,145,115,0.45)] backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-[0_24px_64px_-28px_rgba(165,145,115,0.55)]"
       onClick={onClick}
     >
       {child.isUrgent && (
@@ -34,7 +34,7 @@ export function ChildCard({ child, index, onClick, onOpenGallery }: ChildCardPro
         </div>
       )}
 
-      <div className="relative overflow-hidden bg-[linear-gradient(180deg,rgba(250,243,236,0.96),rgba(255,255,255,0.92)_78%,rgba(255,255,255,0.98)_100%)] px-4 pb-0 pt-6 sm:px-5">
+      <div className="relative overflow-hidden bg-[linear-gradient(180deg,rgba(250,243,236,0.86),rgba(255,255,255,0.78)_78%,rgba(255,255,255,0.92)_100%)] px-4 pb-0 pt-5 sm:px-5">
         <div className="relative flex aspect-[4/4.8] w-full items-end justify-center overflow-hidden rounded-t-[24px]">
           <img
             src={photoUrl}
@@ -51,7 +51,7 @@ export function ChildCard({ child, index, onClick, onOpenGallery }: ChildCardPro
         </div>
       </div>
 
-      <div className={`relative z-10 -mt-4 flex flex-1 flex-col rounded-t-[28px] bg-white px-5 pb-5 pt-6 sm:px-6 sm:pb-6 ${child.isUrgent ? "pt-9" : ""}`}>
+      <div className={`relative z-10 -mt-4 flex flex-1 flex-col rounded-t-[28px] bg-white/94 px-5 pb-5 pt-6 backdrop-blur-sm sm:px-6 sm:pb-6 ${child.isUrgent ? "pt-9" : ""}`}>
         <h3 className="text-xl font-serif font-bold leading-tight text-foreground sm:text-2xl">
           {child.name} {child.surname}
         </h3>
@@ -88,13 +88,13 @@ export function ChildCard({ child, index, onClick, onOpenGallery }: ChildCardPro
             <Button
               size="sm"
               variant="outline"
-              className="h-11 rounded-full border-primary/30 bg-white/85 text-sm text-primary hover:bg-primary/5 sm:h-12 sm:text-base"
+              className="h-11 rounded-full border-primary/30 bg-white/85 px-3 text-center text-[12px] leading-4 text-primary hover:bg-primary/5 sm:h-12 sm:px-4 sm:text-sm"
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenGallery();
               }}
             >
-              Жизнь наших подопечных
+              <span className="block whitespace-normal">Жизнь наших подопечных</span>
             </Button>
           </div>
         </div>

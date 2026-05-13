@@ -125,7 +125,7 @@ export function ChildDialog({ child, open, onOpenChange }: ChildDialogProps) {
                     className="w-full rounded-full h-12 text-base shadow-sm hover:shadow-md transition-all"
                     onClick={handleOpenPaymentMenu}
                   >
-                    Перейти к оплате
+                    Перейти к пожертвованию
                   </Button>
                 </div>
               ) : (
@@ -157,7 +157,7 @@ export function ChildDialog({ child, open, onOpenChange }: ChildDialogProps) {
                       className="w-full rounded-full h-12 gap-2"
                       onClick={() => window.open(settings.donationLink, "_blank")}
                     >
-                      Оплатить онлайн
+                      Пожертвовать
                       <ExternalLink className="w-4 h-4" />
                     </Button>
                   )}

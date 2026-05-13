@@ -1,29 +1,35 @@
-import React, { useState } from "react";
+import React from "react";
 import { useGetPublicSettings } from "@workspace/api-client-react";
-import { PrivacyDialog } from "./PrivacyDialog";
 import { FaTelegram, FaVk, FaWhatsapp, FaInstagram } from "react-icons/fa6";
 
 export function Footer() {
   const { data: settings } = useGetPublicSettings();
-  const [privacyOpen, setPrivacyOpen] = useState(false);
   
   const currentYear = new Date().getFullYear();
   const orgName = settings?.orgName || "Мечты добрых сердец";
 
   return (
-    <footer className="bg-foreground text-background py-12 border-t border-white/10">
+    <footer className="border-t border-white/10 bg-foreground/96 py-8 text-background backdrop-blur-md">
       <div className="container mx-auto px-4 max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-start gap-8 text-center md:text-left">
         <div>
           <h3 className="font-serif text-2xl font-bold mb-2">{orgName}</h3>
           <p className="text-sm text-white/60 mb-6">
             © {currentYear} {orgName}. Все права защищены.
           </p>
-          <button 
-            onClick={() => setPrivacyOpen(true)}
-            className="text-sm text-white/80 hover:text-white underline underline-offset-4 transition-colors"
-          >
-            Политика конфиденциальности
-          </button>
+          <div className="flex flex-col gap-2">
+            <a
+              href="/privacy-policy"
+              className="text-sm text-white/80 underline underline-offset-4 transition-colors hover:text-white"
+            >
+              Политика обработки персональных данных
+            </a>
+            <a
+              href="/personal-data-consent"
+              className="text-sm text-white/80 underline underline-offset-4 transition-colors hover:text-white"
+            >
+              Согласие на обработку персональных данных
+            </a>
+          </div>
         </div>
 
         {settings?.socials && (
@@ -59,8 +65,6 @@ export function Footer() {
           </div>
         )}
       </div>
-
-      <PrivacyDialog open={privacyOpen} onOpenChange={setPrivacyOpen} />
     </footer>
   );
 }
