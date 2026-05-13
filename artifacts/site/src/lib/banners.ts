@@ -7,6 +7,7 @@ export type Banner = {
   imageUrl: string;
   linkUrl: string;
   isEnabled: boolean;
+  isArchived: boolean;
   createdAt: string;
 };
 
@@ -16,6 +17,7 @@ export type BannerInput = {
   imageUrl: string;
   linkUrl: string;
   isEnabled: boolean;
+  isArchived?: boolean;
 };
 
 const adminBannerKey = ["admin-banners"];

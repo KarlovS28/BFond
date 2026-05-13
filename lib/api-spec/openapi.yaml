@@ -615,26 +615,28 @@ components:
 
     VolunteerInput:
       type: object
-      required: [name, phone, email, city, helpType]
+      required: [name, phone, email, city, helpType, consentAccepted]
       properties:
         name: { type: string }
         phone: { type: string }
         email: { type: string }
         city: { type: string }
         helpType: { type: string }
+        consentAccepted: { type: boolean }
 
     MaterialHelpInput:
       type: object
-      required: [name, phone, items, preferredDate]
+      required: [name, phone, items, preferredDate, consentAccepted]
       properties:
         name: { type: string }
         phone: { type: string }
         items: { type: string }
         preferredDate: { type: string }
+        consentAccepted: { type: boolean }
 
     HelpRequestInput:
       type: object
-      required: [childName, age, diagnosis, targetSum, parentContacts]
+      required: [childName, age, diagnosis, targetSum, parentContacts, consentAccepted]
       properties:
         childName: { type: string }
         age: { type: integer }
@@ -642,14 +644,16 @@ components:
         targetSum: { type: integer }
         parentContacts: { type: string }
         photoUrl: { type: string, nullable: true }
+        consentAccepted: { type: boolean }
 
     ContactInput:
       type: object
-      required: [name, email, message]
+      required: [name, email, message, consentAccepted]
       properties:
         name: { type: string }
         email: { type: string }
         message: { type: string }
+        consentAccepted: { type: boolean }
 
     AdminMe:
       type: object
@@ -659,11 +663,12 @@ components:
 
     PublicSettings:
       type: object
-      required: [orgName, slogan, mission, legalAddress, email, phone, donationLink, requisites, socials, documents, logoUrl, logoSize, paymentQrUrl, adminEmail]
+      required: [orgName, slogan, mission, backgroundImageUrl, legalAddress, email, phone, donationLink, requisites, socials, documents, logoUrl, logoSize, paymentQrUrl, adminEmail]
       properties:
         orgName: { type: string }
         slogan: { type: string }
         mission: { type: string }
+        backgroundImageUrl: { type: string }
         legalAddress: { type: string }
         email: { type: string }
         phone: { type: string }

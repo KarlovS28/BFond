@@ -52,6 +52,7 @@ export const GetPublicSettingsResponse = zod.object({
   orgName: zod.string(),
   slogan: zod.string(),
   mission: zod.string(),
+  backgroundImageUrl: zod.string(),
   legalAddress: zod.string(),
   email: zod.string(),
   phone: zod.string(),
@@ -157,6 +158,7 @@ export const SubmitVolunteerBody = zod.object({
   email: zod.string(),
   city: zod.string(),
   helpType: zod.string(),
+  consentAccepted: zod.boolean(),
 });
 
 export const SubmitVolunteerResponse = zod.object({
@@ -169,6 +171,7 @@ export const SubmitMaterialHelpBody = zod.object({
   phone: zod.string(),
   items: zod.string(),
   preferredDate: zod.string(),
+  consentAccepted: zod.boolean(),
 });
 
 export const SubmitMaterialHelpResponse = zod.object({
@@ -183,6 +186,7 @@ export const SubmitHelpRequestBody = zod.object({
   targetSum: zod.number(),
   parentContacts: zod.string(),
   photoUrl: zod.string().nullish(),
+  consentAccepted: zod.boolean(),
 });
 
 export const SubmitHelpRequestResponse = zod.object({
@@ -194,6 +198,7 @@ export const SubmitContactBody = zod.object({
   name: zod.string(),
   email: zod.string(),
   message: zod.string(),
+  consentAccepted: zod.boolean(),
 });
 
 export const SubmitContactResponse = zod.object({
@@ -492,6 +497,7 @@ export const AdminGetSettingsResponse = zod.object({
   orgName: zod.string(),
   slogan: zod.string(),
   mission: zod.string(),
+  backgroundImageUrl: zod.string(),
   legalAddress: zod.string(),
   email: zod.string(),
   phone: zod.string(),
@@ -520,6 +526,7 @@ export const AdminUpdateSettingsBody = zod.object({
   orgName: zod.string(),
   slogan: zod.string(),
   mission: zod.string(),
+  backgroundImageUrl: zod.string(),
   legalAddress: zod.string(),
   email: zod.string(),
   phone: zod.string(),
@@ -548,6 +555,7 @@ export const AdminUpdateSettingsResponse = zod.object({
   orgName: zod.string(),
   slogan: zod.string(),
   mission: zod.string(),
+  backgroundImageUrl: zod.string(),
   legalAddress: zod.string(),
   email: zod.string(),
   phone: zod.string(),

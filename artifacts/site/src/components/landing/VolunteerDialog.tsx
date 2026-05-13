@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useSubmitVolunteer } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
+import { FormConsentField } from "@/components/legal/FormConsentField";
 
 interface VolunteerDialogProps {
   open: boolean;
@@ -18,6 +19,7 @@ export function VolunteerDialog({ open, onOpenChange }: VolunteerDialogProps) {
   const [email, setEmail] = useState("");
   const [city, setCity] = useState("");
   const [helpType, setHelpType] = useState("");
+  const [consentAccepted, setConsentAccepted] = useState(false);
   
   const submit = useSubmitVolunteer();
   const { toast } = useToast();
@@ -25,12 +27,12 @@ export function VolunteerDialog({ open, onOpenChange }: VolunteerDialogProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     submit.mutate(
-      { data: { name, phone, email, city, helpType } },
+      { data: { name, phone, email, city, helpType, consentAccepted } },
       {
         onSuccess: () => {
           toast({ title: "Успешно", description: "Спасибо! Мы свяжемся с вами." });
           onOpenChange(false);
-          setName(""); setPhone(""); setEmail(""); setCity(""); setHelpType("");
+          setName(""); setPhone(""); setEmail(""); setCity(""); setHelpType(""); setConsentAccepted(false);
         },
         onError: () => {
           toast({ title: "Ошибка", description: "Не удалось отправить заявку", variant: "destructive" });
@@ -66,7 +68,8 @@ export function VolunteerDialog({ open, onOpenChange }: VolunteerDialogProps) {
             <Label>Чем вы можете помочь?</Label>
             <Textarea required value={helpType} onChange={e => setHelpType(e.target.value)} className="resize-none" />
           </div>
-          <Button type="submit" className="w-full rounded-full" disabled={submit.isPending}>
+          <FormConsentField checked={consentAccepted} onCheckedChange={setConsentAccepted} />
+          <Button type="submit" className="w-full rounded-full" disabled={submit.isPending || !consentAccepted}>
             {submit.isPending ? "Отправка..." : "Отправить заявку"}
           </Button>
         </form>

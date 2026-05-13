@@ -7,6 +7,7 @@ export function Header() {
 
   const logoUrl = publicUrlForObject(settings?.logoUrl);
   const orgName = settings?.orgName || "Мечты добрых сердец";
+  const scrollRoot = () => document.getElementById("landing-scroll-root");
 
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
@@ -16,22 +17,25 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/70 border-b border-border/50">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
+    <header className="sticky top-0 z-50 w-full border-b border-white/35 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.68))] backdrop-blur-md">
+      <div className="container mx-auto flex h-20 items-center justify-between px-4">
+        <div
+          className="flex cursor-pointer items-center"
+          onClick={() => scrollRoot()?.scrollTo({ top: 0, behavior: "smooth" })}
+        >
           {logoUrl ? (
             <img
               src={logoUrl}
               alt={orgName}
-              style={{ height: `${settings?.logoSize || 40}px` }}
+              style={{ height: `${Math.max(settings?.logoSize || 40, 54)}px` }}
               className="object-contain"
             />
           ) : (
-            <span className="font-serif text-xl font-bold text-primary">{orgName}</span>
+            <span className="font-serif text-2xl font-bold text-primary md:text-3xl">{orgName}</span>
           )}
         </div>
         
-        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-muted-foreground">
+        <nav className="hidden items-center gap-7 text-base font-medium text-muted-foreground md:flex">
           <button onClick={() => scrollTo("about")} className="hover:text-primary transition-colors">О фонде</button>
           <button onClick={() => scrollTo("children")} className="hover:text-primary transition-colors">Кому помочь</button>
           <button onClick={() => scrollTo("help")} className="hover:text-primary transition-colors">Как помочь</button>
@@ -41,7 +45,7 @@ export function Header() {
 
         <button 
           onClick={() => scrollTo("children")}
-          className="bg-primary text-primary-foreground px-5 py-2 rounded-full font-medium hover:bg-primary/90 transition-colors text-sm shadow-sm"
+          className="rounded-full bg-primary px-6 py-3 text-base font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
         >
           Пожертвовать
         </button>

@@ -139,6 +139,16 @@ export function AdminSettingsTab() {
               <Label>Размер логотипа (высота в px)</Label>
               <Input type="number" min="20" max="200" value={formData.logoSize} onChange={e => setFormData({...formData, logoSize: Number(e.target.value)})} />
             </div>
+            <div className="space-y-2">
+              <Label>Фоновое изображение сайта</Label>
+              <FileUploadField
+                value={formData.backgroundImageUrl}
+                onChange={(p) => setFormData({ ...formData, backgroundImageUrl: p })}
+                accept="image/*"
+                preview="image"
+                hint="Фон будет единым для всех секций сайта и останется статичным при прокрутке"
+              />
+            </div>
           </div>
         </div>
 

@@ -12,4 +12,5 @@ export interface VolunteerInput {
   email: string;
   city: string;
   helpType: string;
+  consentAccepted: boolean;
 }

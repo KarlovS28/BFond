@@ -5,7 +5,7 @@ import { formatDate } from "@/lib/format";
 import { Download, FileText } from "lucide-react";
 import { publicUrlForObject } from "@/lib/upload";
 
-export function ReportsSection() {
+export function ReportsSection({ fullHeight = true }: { fullHeight?: boolean }) {
   const { data: recentReports } = useListReports();
   const { data: archiveReports } = useListArchiveReports();
   const [showArchive, setShowArchive] = useState(false);
@@ -13,9 +13,9 @@ export function ReportsSection() {
   if (!recentReports && !archiveReports) return null;
 
   return (
-    <section id="reports" className="py-24 bg-muted/20">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="text-center mb-16">
+    <section id="reports" className={`flex items-center py-6 ${fullHeight ? "min-h-[calc(100dvh-5rem)] md:py-16" : "h-full"}`}>
+      <div className="mx-auto w-full max-w-4xl px-4">
+        <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
             Отчётность
           </h2>
@@ -26,7 +26,7 @@ export function ReportsSection() {
 
         <div className="space-y-4">
           {recentReports?.map((report) => (
-            <div key={report.id} className="flex items-center justify-between p-6 bg-card rounded-2xl border border-border shadow-sm hover:shadow transition-all">
+            <div key={report.id} className="flex items-center justify-between rounded-2xl border border-white/70 bg-white/72 p-5 shadow-[0_20px_65px_-44px_rgba(120,89,59,0.4)] backdrop-blur-md transition-all hover:shadow-md">
               <div className="flex items-center gap-4">
                 <div className="bg-primary/10 p-3 rounded-full text-primary hidden sm:block">
                   <FileText size={24} />
@@ -57,7 +57,7 @@ export function ReportsSection() {
             {showArchive && (
               <div className="space-y-4 mt-6 text-left">
                 {archiveReports.map((report) => (
-                  <div key={report.id} className="flex items-center justify-between p-5 bg-card/50 rounded-2xl border border-border/50">
+                  <div key={report.id} className="flex items-center justify-between rounded-2xl border border-white/60 bg-white/60 p-4 backdrop-blur-md">
                     <div className="flex items-center gap-3">
                       <FileText size={20} className="text-muted-foreground" />
                       <div>

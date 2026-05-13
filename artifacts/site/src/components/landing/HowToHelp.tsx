@@ -4,7 +4,7 @@ import { Heart, Users, PackageOpen } from "lucide-react";
 import { VolunteerDialog } from "./VolunteerDialog";
 import { MaterialHelpDialog } from "./MaterialHelpDialog";
 
-export function HowToHelp() {
+export function HowToHelp({ fullHeight = true }: { fullHeight?: boolean }) {
   const [volOpen, setVolOpen] = useState(false);
   const [matOpen, setMatOpen] = useState(false);
 
@@ -14,9 +14,9 @@ export function HowToHelp() {
   };
 
   return (
-    <section id="help" className="py-24 bg-muted/30">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="text-center mb-16">
+    <section id="help" className={`flex items-center py-6 ${fullHeight ? "min-h-[calc(100dvh-5rem)] md:py-16" : "h-full"}`}>
+      <div className="mx-auto w-full max-w-[980px] px-2 md:max-w-[1160px] lg:max-w-[1320px] xl:max-w-[1480px]">
+        <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
             Как помочь
           </h2>
@@ -25,9 +25,9 @@ export function HowToHelp() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className={`grid gap-6 ${fullHeight ? "md:grid-cols-3" : "lg:grid-cols-3"}`}>
           {/* Card 1 */}
-          <div className="bg-card rounded-3xl p-8 border border-border shadow-sm flex flex-col items-center text-center">
+          <div className="flex min-h-[360px] flex-col items-center rounded-3xl border border-white/70 bg-white/72 p-8 text-center shadow-[0_20px_65px_-44px_rgba(120,89,59,0.4)] backdrop-blur-md">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary">
               <Heart size={32} />
             </div>
@@ -41,7 +41,7 @@ export function HowToHelp() {
           </div>
 
           {/* Card 2 */}
-          <div className="bg-card rounded-3xl p-8 border border-border shadow-sm flex flex-col items-center text-center">
+          <div className="flex min-h-[360px] flex-col items-center rounded-3xl border border-white/70 bg-white/72 p-8 text-center shadow-[0_20px_65px_-44px_rgba(120,89,59,0.4)] backdrop-blur-md">
             <div className="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mb-6 text-secondary-foreground">
               <Users size={32} />
             </div>
@@ -55,7 +55,7 @@ export function HowToHelp() {
           </div>
 
           {/* Card 3 */}
-          <div className="bg-card rounded-3xl p-8 border border-border shadow-sm flex flex-col items-center text-center">
+          <div className="flex min-h-[360px] flex-col items-center rounded-3xl border border-white/70 bg-white/72 p-8 text-center shadow-[0_20px_65px_-44px_rgba(120,89,59,0.4)] backdrop-blur-md">
             <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center mb-6 text-accent-foreground">
               <PackageOpen size={32} />
             </div>

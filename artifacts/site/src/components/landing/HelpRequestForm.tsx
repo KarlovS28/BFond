@@ -6,13 +6,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSubmitHelpRequest } from "@workspace/api-client-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
+import { FormConsentField } from "@/components/legal/FormConsentField";
 
-export function HelpRequestForm() {
+export function HelpRequestForm({ fullHeight = true }: { fullHeight?: boolean }) {
   const [childName, setChildName] = useState("");
   const [age, setAge] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
   const [targetSum, setTargetSum] = useState("");
   const [parentContacts, setParentContacts] = useState("");
+  const [consentAccepted, setConsentAccepted] = useState(false);
 
   const submit = useSubmitHelpRequest();
   const { toast } = useToast();
@@ -26,13 +28,14 @@ export function HelpRequestForm() {
           age: parseInt(age, 10), 
           diagnosis, 
           targetSum: parseInt(targetSum, 10), 
-          parentContacts
+          parentContacts,
+          consentAccepted,
         } 
       },
       {
         onSuccess: () => {
           toast({ title: "Заявка отправлена", description: "Мы рассмотрим её в течение 3 рабочих дней." });
-          setChildName(""); setAge(""); setDiagnosis(""); setTargetSum(""); setParentContacts("");
+          setChildName(""); setAge(""); setDiagnosis(""); setTargetSum(""); setParentContacts(""); setConsentAccepted(false);
         },
         onError: () => {
           toast({ title: "Ошибка", description: "Проверьте правильность заполнения полей", variant: "destructive" });
@@ -42,9 +45,9 @@ export function HelpRequestForm() {
   };
 
   return (
-    <section id="help-request" className="py-24 bg-white">
-      <div className="container mx-auto px-4 max-w-4xl">
-        <div className="text-center mb-12">
+    <section id="help-request" className={`flex items-center py-6 ${fullHeight ? "min-h-[calc(100dvh-5rem)] md:py-16" : "h-full"}`}>
+      <div className="mx-auto w-full max-w-4xl px-4">
+        <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
             Вам нужна помощь?
           </h2>
@@ -53,7 +56,7 @@ export function HelpRequestForm() {
           </p>
         </div>
 
-        <Card className="p-8 md:p-10 rounded-3xl bg-background/50 border border-border shadow-sm">
+        <Card className="rounded-3xl border border-white/70 bg-white/72 p-7 shadow-[0_24px_80px_-46px_rgba(120,89,59,0.4)] backdrop-blur-md md:p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -79,7 +82,13 @@ export function HelpRequestForm() {
               <Textarea required value={parentContacts} onChange={e => setParentContacts(e.target.value)} className="resize-none" />
             </div>
 
-            <Button type="submit" className="w-full md:w-auto md:px-12 rounded-full h-12 text-base" disabled={submit.isPending}>
+            <FormConsentField
+              checked={consentAccepted}
+              onCheckedChange={setConsentAccepted}
+              variant="child"
+            />
+
+            <Button type="submit" className="w-full md:w-auto md:px-12 rounded-full h-12 text-base" disabled={submit.isPending || !consentAccepted}>
               {submit.isPending ? "Отправка..." : "Отправить заявку"}
             </Button>
           </form>

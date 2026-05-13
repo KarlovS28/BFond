@@ -1,7 +1,21 @@
 import { Router, type IRouter } from "express";
-import { db, childrenTable, storiesTable, reportsTable, galleryItemsTable, galleryPhotosTable, bannersTable, donationClicksTable, volunteersTable, materialHelpTable, helpRequestsTable, contactsTable, visitsTable } from "@workspace/db";
+import { db } from "@workspace/db";
+import {
+  bannersTable,
+  childrenTable,
+  contactsTable,
+  donationClicksTable,
+  galleryItemsTable,
+  galleryPhotosTable,
+  helpRequestsTable,
+  materialHelpTable,
+  reportsTable,
+  storiesTable,
+  visitsTable,
+  volunteersTable,
+} from "@workspace/db/schema";
 import { sendMail } from "../lib/mailer";
-import { desc, eq, gte, lt } from "drizzle-orm";
+import { and, desc, eq, gte, lt } from "drizzle-orm";
 import {
   GetPublicSettingsResponse,
   ListChildrenResponse,
@@ -82,14 +96,10 @@ router.get("/banners", async (_req, res) => {
   const rows = await db
     .select()
     .from(bannersTable)
-    .where(eq(bannersTable.isEnabled, true))
+    .where(and(eq(bannersTable.isEnabled, true), eq(bannersTable.isArchived, false)))
     .orderBy(desc(bannersTable.createdAt), desc(bannersTable.id));
 
-  res.json(
-    rows
-      .filter((row) => !row.isArchived)
-      .map((row) => ({ ...row, createdAt: row.createdAt.toISOString() })),
-  );
+  res.json(rows.map((row) => ({ ...row, createdAt: row.createdAt.toISOString() })));
 });
 
 const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7;
@@ -136,18 +146,54 @@ router.post("/donation-clicks", async (req, res) => {
 
 router.post("/volunteers", async (req, res) => {
   const body = SubmitVolunteerBody.parse(req.body);
-  const inserted = await db.insert(volunteersTable).values(body).returning({ id: volunteersTable.id });
+  if (!body.consentAccepted) {
+    res.status(400).json({ error: "Необходимо согласие на обработку персональных данных" });
+    return;
+  }
+
+  const inserted = await db
+    .insert(volunteersTable)
+    .values({
+      name: body.name,
+      phone: body.phone,
+      email: body.email,
+      city: body.city,
+      helpType: body.helpType,
+      consentAccepted: true,
+      consentAcceptedAt: new Date(),
+    })
+    .returning({ id: volunteersTable.id });
   res.json({ ok: true, id: inserted[0]?.id ?? null });
 });
 
 router.post("/materials", async (req, res) => {
   const body = SubmitMaterialHelpBody.parse(req.body);
-  const inserted = await db.insert(materialHelpTable).values(body).returning({ id: materialHelpTable.id });
+  if (!body.consentAccepted) {
+    res.status(400).json({ error: "Необходимо согласие на обработку персональных данных" });
+    return;
+  }
+
+  const inserted = await db
+    .insert(materialHelpTable)
+    .values({
+      name: body.name,
+      phone: body.phone,
+      items: body.items,
+      preferredDate: body.preferredDate,
+      consentAccepted: true,
+      consentAcceptedAt: new Date(),
+    })
+    .returning({ id: materialHelpTable.id });
   res.json({ ok: true, id: inserted[0]?.id ?? null });
 });
 
 router.post("/help-requests", async (req, res) => {
   const body = SubmitHelpRequestBody.parse(req.body);
+  if (!body.consentAccepted) {
+    res.status(400).json({ error: "Необходимо согласие на обработку персональных данных" });
+    return;
+  }
+
   const inserted = await db
     .insert(helpRequestsTable)
     .values({
@@ -157,6 +203,8 @@ router.post("/help-requests", async (req, res) => {
       targetSum: body.targetSum,
       parentContacts: body.parentContacts,
       photoUrl: body.photoUrl ?? null,
+      consentAccepted: true,
+      consentAcceptedAt: new Date(),
     })
     .returning({ id: helpRequestsTable.id });
 
@@ -187,7 +235,21 @@ router.post("/help-requests", async (req, res) => {
 
 router.post("/contacts", async (req, res) => {
   const body = SubmitContactBody.parse(req.body);
-  const inserted = await db.insert(contactsTable).values(body).returning({ id: contactsTable.id });
+  if (!body.consentAccepted) {
+    res.status(400).json({ error: "Необходимо согласие на обработку персональных данных" });
+    return;
+  }
+
+  const inserted = await db
+    .insert(contactsTable)
+    .values({
+      name: body.name,
+      email: body.email,
+      message: body.message,
+      consentAccepted: true,
+      consentAcceptedAt: new Date(),
+    })
+    .returning({ id: contactsTable.id });
   res.json({ ok: true, id: inserted[0]?.id ?? null });
 });
 

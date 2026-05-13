@@ -62,13 +62,19 @@ export function GalleryLifeSection({
 
   useEffect(() => {
     if (selectedFilter === null) return;
-    document.getElementById("gallery-life")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    requestAnimationFrame(() => {
+      const root = document.getElementById("landing-scroll-root");
+      const target = document.getElementById("gallery-life");
+      if (root && target) {
+        root.scrollTo({ top: target.offsetTop, behavior: "smooth" });
+      }
+    });
   }, [selectedFilter]);
 
   return (
-    <section id="gallery-life" className="bg-[linear-gradient(180deg,#fff8f2_0%,#fff 100%)] py-24">
+    <section id="gallery-life" className="flex min-h-[calc(100dvh-5rem)] items-start py-10 md:py-12">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="mb-14 text-center">
+        <div className="mb-10 text-center">
           <h2 className="mb-4 text-4xl font-serif font-bold text-foreground md:text-5xl">
             Жизнь наших подопечных
           </h2>
@@ -81,10 +87,10 @@ export function GalleryLifeSection({
           <button
             type="button"
             onClick={() => onSelectFilter("general")}
-            className={`rounded-[28px] border p-5 text-left transition-all ${
+            className={`rounded-[28px] border p-5 text-left backdrop-blur-md transition-all ${
               selectedFilter === "general"
-                ? "border-primary bg-primary/10 shadow-sm"
-                : "border-border bg-white hover:-translate-y-0.5 hover:shadow-sm"
+                ? "border-primary bg-white/78 shadow-sm"
+                : "border-border bg-white/62 hover:-translate-y-0.5 hover:shadow-sm"
             }`}
           >
             <p className="text-sm uppercase tracking-[0.2em] text-primary/70">Раздел</p>
@@ -101,10 +107,10 @@ export function GalleryLifeSection({
                 key={String(group.key)}
                 type="button"
                 onClick={() => onSelectFilter(group.key)}
-                className={`rounded-[28px] border p-5 text-left transition-all ${
+                className={`rounded-[28px] border p-5 text-left backdrop-blur-md transition-all ${
                   selectedFilter === group.key
-                    ? "border-primary bg-primary/10 shadow-sm"
-                    : "border-border bg-white hover:-translate-y-0.5 hover:shadow-sm"
+                    ? "border-primary bg-white/78 shadow-sm"
+                    : "border-border bg-white/62 hover:-translate-y-0.5 hover:shadow-sm"
                 }`}
               >
                 <p className="text-sm uppercase tracking-[0.2em] text-primary/70">Подопечный</p>
@@ -121,7 +127,7 @@ export function GalleryLifeSection({
             <button
               type="button"
               onClick={() => onSelectFilter(null)}
-              className="rounded-full border border-border bg-white px-5 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+              className="rounded-full border border-border bg-white/82 px-5 py-2 text-sm font-medium text-foreground backdrop-blur-sm transition-colors hover:bg-muted"
             >
               Показать все карточки
             </button>
@@ -138,7 +144,7 @@ export function GalleryLifeSection({
             ))}
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="rounded-[30px] border border-dashed border-primary/25 bg-white/70 px-6 py-12 text-center">
+          <div className="rounded-[30px] border border-dashed border-primary/25 bg-white/72 px-6 py-10 text-center backdrop-blur-md">
             <h3 className="text-2xl font-serif font-bold text-foreground">Галерея скоро наполнится</h3>
             <p className="mt-3 text-muted-foreground">
               Раздел уже подключён. После добавления карточек в административной панели они появятся здесь.
@@ -153,7 +159,7 @@ export function GalleryLifeSection({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.4, delay: Math.min(index * 0.04, 0.18) }}
-              className="group relative cursor-pointer overflow-hidden rounded-[30px] border border-white/70 bg-white shadow-[0_18px_48px_-28px_rgba(165,145,115,0.45)]"
+              className="group relative cursor-pointer overflow-hidden rounded-[30px] border border-white/70 bg-white/70 shadow-[0_18px_48px_-28px_rgba(165,145,115,0.45)] backdrop-blur-sm"
               onClick={() => {
                 setActiveAlbumId(item.id);
                 setActivePhotoIndex(0);

@@ -7,15 +7,15 @@ import { publicUrlForObject } from "@/lib/upload";
 
 export function StoriesCarousel() {
   const { data: stories } = useListStories();
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true });
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "center" });
 
   if (!stories || stories.length === 0) return null;
 
   return (
-    <section className="py-24 bg-white">
-      <div className="container mx-auto px-4 max-w-6xl">
-        <div className="flex justify-between items-end mb-12">
-          <div>
+    <section className="flex min-h-[calc(100dvh-5rem)] items-center py-14 md:py-16">
+      <div className="container mx-auto max-w-[1500px] px-4">
+        <div className="mb-8 flex flex-col items-center justify-center gap-5 text-center md:flex-row md:items-end md:justify-between md:text-left">
+          <div className="mx-auto max-w-3xl md:mx-0">
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
               Истории спасённых
             </h2>
@@ -23,7 +23,7 @@ export function StoriesCarousel() {
               Благодаря вашей поддержке они получили шанс на здоровое будущее.
             </p>
           </div>
-          <div className="hidden md:flex gap-2">
+          <div className="flex gap-2">
             <Button variant="outline" size="icon" className="rounded-full" onClick={() => emblaApi?.scrollPrev()}>
               <ChevronLeft className="h-5 w-5" />
             </Button>
@@ -33,11 +33,14 @@ export function StoriesCarousel() {
           </div>
         </div>
 
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex -ml-4">
+        <div className="relative mx-auto max-w-[1320px]">
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 hidden w-16 bg-gradient-to-r from-[rgba(255,248,242,0.98)] via-[rgba(255,248,242,0.78)] to-transparent md:block" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 hidden w-16 bg-gradient-to-l from-[rgba(255,248,242,0.98)] via-[rgba(255,248,242,0.78)] to-transparent md:block" />
+        <div className="touch-pan-y overflow-hidden" ref={emblaRef}>
+          <div className="flex -ml-4 items-stretch justify-center">
             {stories.map((story) => (
-              <div key={story.id} className="flex-[0_0_80%] md:flex-[0_0_40%] lg:flex-[0_0_30%] min-w-0 pl-4">
-                <div className="group relative rounded-2xl overflow-hidden aspect-[4/5] bg-muted cursor-pointer">
+              <div key={story.id} className="min-w-0 flex-[0_0_82%] pl-4 md:flex-[0_0_42%] lg:flex-[0_0_31%]">
+                <div className="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/70 bg-white/72 aspect-[4/5] backdrop-blur-sm">
                   <img 
                     src={publicUrlForObject(story.photoUrl) || "/child-placeholder.png"} 
                     alt={story.title} 
@@ -59,6 +62,7 @@ export function StoriesCarousel() {
               </div>
             ))}
           </div>
+        </div>
         </div>
       </div>
     </section>

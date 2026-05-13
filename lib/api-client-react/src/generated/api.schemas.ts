@@ -72,6 +72,7 @@ export interface VolunteerInput {
   email: string;
   city: string;
   helpType: string;
+  consentAccepted: boolean;
 }
 
 export interface MaterialHelpInput {
@@ -79,6 +80,7 @@ export interface MaterialHelpInput {
   phone: string;
   items: string;
   preferredDate: string;
+  consentAccepted: boolean;
 }
 
 export interface HelpRequestInput {
@@ -88,12 +90,14 @@ export interface HelpRequestInput {
   targetSum: number;
   parentContacts: string;
   photoUrl?: string | null;
+  consentAccepted: boolean;
 }
 
 export interface ContactInput {
   name: string;
   email: string;
   message: string;
+  consentAccepted: boolean;
 }
 
 export interface AdminMe {
@@ -117,6 +121,7 @@ export interface PublicSettings {
   orgName: string;
   slogan: string;
   mission: string;
+  backgroundImageUrl: string;
   legalAddress: string;
   email: string;
   phone: string;

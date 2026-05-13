@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { MapPin, Phone, Mail } from "lucide-react";
 import { FaTelegram, FaVk, FaWhatsapp, FaInstagram } from "react-icons/fa6";
+import { FormConsentField } from "@/components/legal/FormConsentField";
 
 export function ContactsSection() {
   const { data: settings } = useGetPublicSettings();
@@ -16,15 +17,16 @@ export function ContactsSection() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
+  const [consentAccepted, setConsentAccepted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     submit.mutate(
-      { data: { name, email, message } },
+      { data: { name, email, message, consentAccepted } },
       {
         onSuccess: () => {
           toast({ title: "Сообщение отправлено", description: "Мы ответим вам в ближайшее время." });
-          setName(""); setEmail(""); setMessage("");
+          setName(""); setEmail(""); setMessage(""); setConsentAccepted(false);
         },
         onError: () => {
           toast({ title: "Ошибка", description: "Не удалось отправить сообщение", variant: "destructive" });
@@ -36,9 +38,9 @@ export function ContactsSection() {
   if (!settings) return null;
 
   return (
-    <section id="contacts" className="py-24 bg-white">
+    <section id="contacts" className="flex items-center py-10 md:py-12">
       <div className="container mx-auto px-4 max-w-6xl">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-serif font-bold text-foreground mb-4">
             Контакты
           </h2>
@@ -47,8 +49,8 @@ export function ContactsSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
-          <div>
+        <div className="grid gap-8 md:grid-cols-2 lg:gap-12">
+          <div className="rounded-[30px] border border-white/70 bg-white/62 p-6 shadow-[0_20px_65px_-44px_rgba(120,89,59,0.4)] backdrop-blur-md">
             <div className="space-y-8">
               <div className="flex items-start gap-4">
                 <div className="bg-primary/10 p-3 rounded-full text-primary shrink-0">
@@ -119,8 +121,8 @@ export function ContactsSection() {
             </div>
           </div>
 
-          <div className="bg-muted/30 p-8 rounded-3xl">
-            <h3 className="text-2xl font-serif font-bold mb-6">Напишите нам</h3>
+          <div className="rounded-3xl border border-white/70 bg-white/72 p-6 shadow-[0_20px_65px_-44px_rgba(120,89,59,0.4)] backdrop-blur-md md:p-7">
+            <h3 className="mb-5 text-2xl font-serif font-bold">Напишите нам</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label>Ваше имя</Label>
@@ -134,7 +136,8 @@ export function ContactsSection() {
                 <Label>Сообщение</Label>
                 <Textarea required value={message} onChange={e => setMessage(e.target.value)} className="bg-white resize-none h-32" />
               </div>
-              <Button type="submit" className="w-full rounded-full mt-2" disabled={submit.isPending}>
+              <FormConsentField checked={consentAccepted} onCheckedChange={setConsentAccepted} />
+              <Button type="submit" className="w-full rounded-full mt-2" disabled={submit.isPending || !consentAccepted}>
                 {submit.isPending ? "Отправка..." : "Отправить"}
               </Button>
             </form>

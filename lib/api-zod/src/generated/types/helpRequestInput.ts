@@ -13,4 +13,5 @@ export interface HelpRequestInput {
   targetSum: number;
   parentContacts: string;
   photoUrl?: string | null;
+  consentAccepted: boolean;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Banner,
   BannerInput,
@@ -18,7 +18,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { FileUploadField } from "./FileUploadField";
 import { useToast } from "@/hooks/use-toast";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Archive, Pencil, Plus, RotateCcw, Trash2 } from "lucide-react";
 
 const emptyForm: BannerInput = {
   title: "",
@@ -26,6 +26,7 @@ const emptyForm: BannerInput = {
   imageUrl: "",
   linkUrl: "",
   isEnabled: true,
+  isArchived: false,
 };
 
 export function AdminBannersTab() {
@@ -40,6 +41,17 @@ export function AdminBannersTab() {
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<BannerInput>(emptyForm);
+  const [showArchive, setShowArchive] = useState(false);
+
+  const activeBanners = useMemo(
+    () => (banners ?? []).filter((banner) => !banner.isArchived),
+    [banners],
+  );
+  const archivedBanners = useMemo(
+    () => (banners ?? []).filter((banner) => banner.isArchived),
+    [banners],
+  );
+  const visibleBanners = showArchive ? archivedBanners : activeBanners;
 
   const openCreate = () => {
     setEditingBanner(null);
@@ -55,6 +67,7 @@ export function AdminBannersTab() {
       imageUrl: banner.imageUrl,
       linkUrl: banner.linkUrl,
       isEnabled: banner.isEnabled,
+      isArchived: banner.isArchived,
     });
     setDialogOpen(true);
   };
@@ -101,13 +114,58 @@ export function AdminBannersTab() {
     });
   };
 
+  const handleArchiveToggle = async (banner: Banner, isArchived: boolean) => {
+    try {
+      await updateBanner.mutateAsync({
+        id: banner.id,
+        data: {
+          title: banner.title,
+          description: banner.description,
+          imageUrl: banner.imageUrl,
+          linkUrl: banner.linkUrl,
+          isEnabled: banner.isEnabled,
+          isArchived,
+        },
+      });
+
+      toast({
+        title: "Успешно",
+        description: isArchived ? "Баннер перенесён в архив" : "Баннер возвращён из архива",
+      });
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: error instanceof Error ? error.message : "Не удалось обновить баннер",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (isLoading) return <div>Загрузка...</div>;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-serif font-medium">Банеры</h2>
-        <Button onClick={openCreate} className="gap-2" disabled={(banners?.length ?? 0) >= 10}>
+        <div className="space-y-2">
+          <h2 className="text-xl font-serif font-medium">Банеры</h2>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant={!showArchive ? "default" : "outline"}
+              onClick={() => setShowArchive(false)}
+            >
+              Активные банеры
+            </Button>
+            <Button
+              type="button"
+              variant={showArchive ? "default" : "outline"}
+              onClick={() => setShowArchive(true)}
+            >
+              Архив банеров
+            </Button>
+          </div>
+        </div>
+        <Button onClick={openCreate} className="gap-2" disabled={activeBanners.length >= 10}>
           <Plus size={16} /> Добавить баннер
         </Button>
       </div>
@@ -124,7 +182,7 @@ export function AdminBannersTab() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {banners?.map((banner) => (
+            {visibleBanners.map((banner) => (
               <TableRow key={banner.id}>
                 <TableCell>
                   <img
@@ -143,6 +201,7 @@ export function AdminBannersTab() {
                 <TableCell>
                   <Switch
                     checked={banner.isEnabled}
+                    disabled={banner.isArchived}
                     onCheckedChange={(checked) =>
                       updateBanner.mutate({
                         id: banner.id,
@@ -152,13 +211,35 @@ export function AdminBannersTab() {
                           imageUrl: banner.imageUrl,
                           linkUrl: banner.linkUrl,
                           isEnabled: checked,
+                          isArchived: banner.isArchived,
                         },
                       })
                     }
                   />
                 </TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" onClick={() => openEdit(banner)}><Pencil size={16} /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => openEdit(banner)}>
+                    <Pencil size={16} />
+                  </Button>
+                  {banner.isArchived ? (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleArchiveToggle(banner, false)}
+                      title="Вернуть из архива"
+                    >
+                      <RotateCcw size={16} />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleArchiveToggle(banner, true)}
+                      title="Перенести в архив"
+                    >
+                      <Archive size={16} />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
@@ -173,10 +254,10 @@ export function AdminBannersTab() {
                 </TableCell>
               </TableRow>
             ))}
-            {(!banners || banners.length === 0) && (
+            {visibleBanners.length === 0 && (
               <TableRow>
                 <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
-                  Пока нет баннеров
+                  {showArchive ? "Архив банеров пока пуст" : "Пока нет активных баннеров"}
                 </TableCell>
               </TableRow>
             )}
